@@ -1,0 +1,80 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.1.7'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.bitharmony'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	//JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	//SPRING BATCH
+	implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+	//REDIS
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+
+	//QUARTZ
+	implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
+	//SPRING SECURITY
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	//VALIDATION
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	//SPRING WEB
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	//LOMBOK
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	//DEVTOOLS
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	//JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3', 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+	//AWS
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	//TEST
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.batch:spring-batch-test'
+	testImplementation 'io.projectreactor:reactor-test'
+
+	// THYMELEAF
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	//JSON
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+}
+
+tasks.named('bootBuildImage') {
+	builder = 'paketobuildpacks/builder-jammy-base:latest'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

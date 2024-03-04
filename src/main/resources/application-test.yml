@@ -1,0 +1,9 @@
+spring:
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    url: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
