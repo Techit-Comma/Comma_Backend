@@ -105,4 +105,4 @@
 <br>
 
 ## 🎶 BitHarmony - 프로젝트 팀원
-[조유민](https://github.com/YuminJo) / [김용욱](https://github.com/yonguk98) / [박상혁](https://github.com/DropTheGit) / [조동국](https://github.com/ppusda) / [문창현](https://github.com/changhyun9)
+[조유민](https://github.com/YuminJo) / [박상혁](https://github.com/DropTheGit) / [조동국](https://github.com/ppusda) /
