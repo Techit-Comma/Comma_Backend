@@ -18,12 +18,14 @@ public class NcpImageUtil {
 	private final String bucketName;
 	private final String endPoint;
 	private final String imageCdn;
+	private final String memberCdn;
 	private final String imageCdnQueryString;
 
 	public NcpImageUtil(NcpConfig ncpConfig) {
 		bucketName = ncpConfig.getS3().getImageBucket();
 		endPoint = ncpConfig.getS3().getEndPoint();
-		imageCdn = ncpConfig.getImageOptimizer().getCdn();
+		imageCdn = ncpConfig.getImageOptimizer().getAlbumCdn();
+		memberCdn = ncpConfig.getImageOptimizer().getMemberCdn();
 		imageCdnQueryString = ncpConfig.getImageOptimizer().getQueryString();
 
 		String accessKey = ncpConfig.getImageCredentials().getAccessKey();

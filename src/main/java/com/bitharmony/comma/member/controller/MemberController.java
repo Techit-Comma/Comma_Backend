@@ -1,27 +1,24 @@
 package com.bitharmony.comma.member.controller;
 
 import com.bitharmony.comma.global.response.GlobalResponse;
-import com.bitharmony.comma.member.dto.MemberJoinRequest;
-import com.bitharmony.comma.member.dto.MemberLoginRequest;
-import com.bitharmony.comma.member.dto.MemberModifyRequest;
-import com.bitharmony.comma.member.dto.MemberPwModifyRequest;
-import com.bitharmony.comma.member.dto.MemberReturnResponse;
+import com.bitharmony.comma.member.dto.*;
+import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
+import com.bitharmony.comma.member.service.ProfileImageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/member")
 public class MemberController {
     private final MemberService memberService;
+    private final ProfileImageService profileImageService;
 
     @PostMapping("/login")
     public GlobalResponse login(@RequestBody @Valid MemberLoginRequest memberLoginRequest) {
@@ -53,7 +50,8 @@ public class MemberController {
     }
 
     @GetMapping("/{username}")
-    public GlobalResponse profile(@PathVariable("username") String username) {
+    @PreAuthorize("isAuthenticated()")
+    public GlobalResponse<MemberReturnResponse> profile(@PathVariable("username") String username) {
         MemberReturnResponse response = memberService.getProfile(username);
         return GlobalResponse.of("200", response);
     }
@@ -70,5 +68,26 @@ public class MemberController {
                 memberPwModifyRequest.passwordModifyCheck());
 
         return GlobalResponse.of("200");
+    }
+
+    @PostMapping("/setProfileImage")
+    @PreAuthorize("isAuthenticated()")
+    public GlobalResponse<MemberImageResponse> setProfileImage(
+            @RequestParam("file") MultipartFile file,
+            Principal principal
+    ) {
+        Member member = memberService.getMemberByUsername(principal.getName());
+        String oldImagePath = member.getImagePath();
+
+        MemberImageResponse memberImageResponse = profileImageService.uploadFile(file);
+        if (oldImagePath != null && !oldImagePath.equals("member-images/default_profile.jpg")) {
+            profileImageService.deleteFile(oldImagePath);
+        }
+        memberService.setProfileImage(member, memberImageResponse.uploadFileUrl());
+
+        return GlobalResponse.of(
+                "200",
+                memberImageResponse
+        );
     }
 }

@@ -48,6 +48,9 @@ public class Member {
     private String nickname;
 
     @Builder.Default
+    private String imagePath = "member-images/default_profile.jpg";
+
+    @Builder.Default
     private Long credit = 0L;
 
     @OneToMany(mappedBy = "following")
