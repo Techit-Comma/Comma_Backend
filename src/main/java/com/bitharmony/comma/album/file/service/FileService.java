@@ -8,14 +8,17 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.GetObjectMetadataRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.bitharmony.comma.album.album.exception.AlbumFileException;
 import com.bitharmony.comma.album.file.dto.FileResponse;
 import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
-import com.bitharmony.comma.album.album.exception.AlbumFileException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +30,24 @@ public class FileService {
 	public String getUuidFileName(String fileName) {
 		String ext = fileName.substring(fileName.indexOf(".") + 1);
 		return UUID.randomUUID() + "." + ext;
+	}
+
+	public boolean isFileUploadedToS3(String filePath) {
+		AmazonS3 s3Client = ncpImageUtil.getAmazonS3();
+		GetObjectMetadataRequest getMetadataRequest = new GetObjectMetadataRequest(ncpImageUtil.getBucketName(), getFileName(filePath, ncpImageUtil.getBucketName()));
+
+		try {
+			s3Client.getObjectMetadata(getMetadataRequest);
+			return true;
+		} catch (AmazonS3Exception e) {
+			if (e.getStatusCode() == 404) {
+				// Object not found
+				return false;
+			} else {
+				// Some other error. Rethrow the exception.
+				throw e;
+			}
+		}
 	}
 
 	/**
@@ -63,29 +84,6 @@ public class FileService {
 			.uploadFileUrl(uploadFileUrl)
 			.build();
 	}
-
-	// public void updateFile(MultipartFile multipartFile, String filePath, String bucketName) {
-	// 	ObjectMetadata objectMetadata = new ObjectMetadata();
-	// 	objectMetadata.setContentLength(multipartFile.getSize());
-	// 	objectMetadata.setContentType(multipartFile.getContentType());
-	//
-	// 	try (InputStream inputStream = multipartFile.getInputStream()) {
-	// 		String keyName = getFileName(filePath, bucketName);
-	//
-	// 		// S3에 폴더 및 파일 업데이트
-	// 		/**
-	// 		 * Amazon S3에서는 동일한 이름(키)을 가진 파일을 업로드하면 기존 파일을 덮어씁니다.
-	// 		 * 따라서, 같은 이름의 새로운 파일을 업로드하면 기존 파일이 자동으로 업데이트됩니다.
-	// 		 * 별도로 삭제 과정을 거칠 필요는 없습니다.
-	// 		 */
-	// 		amazonS3Client.putObject(
-	// 			new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata).withCannedAcl(
-	// 				CannedAccessControlList.PublicRead));
-	//
-	// 	} catch (IOException e) {
-	// 		e.printStackTrace();
-	// 	}
-	// }
 
 	public void deleteFile(String filePath, String bucketName) {
 		if(filePath == null) return;

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bitharmony.comma.album.Image.service.AlbumImageService;
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
@@ -18,7 +19,6 @@ import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.file.service.FileService;
-import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.streaming.util.NcpMusicUtil;
@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AlbumService {
+	private final AlbumImageService albumImageService;
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
 	private final NcpImageUtil ncpImageUtil;
@@ -108,18 +109,12 @@ public class AlbumService {
 			+ ncpImageUtil.getImageCdnQueryString();
 	}
 
-	public String getAlbumFileUrl(String filepath) {
-		return ncpImageUtil.getEndPoint() + "/" + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "");
-	}
-
 	public boolean canRelease(String name, MultipartFile musicImageFile, Member member) {
 		if (member == null)
 			return false;
 		if (albumRepository.findByAlbumname(name).isPresent())
 			return false;
-
-		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
-		if (imgFile.isEmpty() && musicImageFile != null)
+		if (albumImageService.checkImageFile(musicImageFile))
 			return false;
 
 		return true;
@@ -133,9 +128,7 @@ public class AlbumService {
 			return false;
 		if (albumRepository.findByAlbumname(request.albumname()).isPresent() && !album.getAlbumname().equals(request.albumname()))
 			return false;
-
-		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
-		if (imgFile.isEmpty() && musicImageFile != null)
+		if (albumImageService.checkImageFile(musicImageFile))
 			return false;
 
 		return true;
@@ -145,9 +138,5 @@ public class AlbumService {
 		if (!album.getMember().getUsername().equals(principal.getName()))
 			return false;
 		return true;
-	}
-
-	public Album getAlbumByFilePath(String filePath) {
-		return albumRepository.findByFilePath(filePath).orElseThrow(AlbumNotFoundException::new);
 	}
 }
