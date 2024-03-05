@@ -44,7 +44,8 @@ public class NcpConfig {
 	@Getter
 	@RequiredArgsConstructor
 	public static class ImageOptimizer {
-		private final String cdn;
+		private final String albumCdn;
+		private final String memberCdn;
 		private final String queryString;
 	}
 
