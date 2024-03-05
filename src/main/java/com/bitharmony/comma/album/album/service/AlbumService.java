@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.Image.service.AlbumImageService;
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
@@ -36,20 +35,20 @@ public class AlbumService {
 	private final NcpMusicUtil ncpMusicUtil;
 
 	@Transactional
-	public Album release(AlbumCreateRequest request, Member member, MultipartFile musicImageFile) {
+	public Album release(AlbumCreateRequest request, Member member) {
 		Album album = request.toEntity();
 		album.updateReleaseMember(member);
-		return saveAlbum(album, musicImageFile);
+		return saveAlbum(album);
 	}
 
 	@Transactional
-	public Album edit(AlbumEditRequest request, Album album, MultipartFile musicImageFile) {
+	public Album edit(AlbumEditRequest request, Album album) {
 		album.update(request);
 
-		if (musicImageFile != null && album.getFilePath() != null)
+		if (album.getFilePath() != null)
 			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()), ncpImageUtil.getBucketName());
 
-		saveAlbum(album, musicImageFile);
+		saveAlbum(album);
 		return album;
 	}
 
@@ -60,12 +59,7 @@ public class AlbumService {
 		albumRepository.delete(album);
 	}
 
-	public Album saveAlbum(Album album, MultipartFile musicImageFile) {
-		if (musicImageFile != null) {
-			String imageUrl = fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName()).uploadFileUrl();
-			album = album.toBuilder().imagePath(imageUrl).build();
-		}
-
+	public Album saveAlbum(Album album) {
 		albumRepository.save(album);
 		return album;
 	}
@@ -109,26 +103,21 @@ public class AlbumService {
 			+ ncpImageUtil.getImageCdnQueryString();
 	}
 
-	public boolean canRelease(String name, MultipartFile musicImageFile, Member member) {
+	public boolean canRelease(String name, Member member) {
 		if (member == null)
 			return false;
 		if (albumRepository.findByAlbumname(name).isPresent())
-			return false;
-		if (albumImageService.checkImageFile(musicImageFile))
 			return false;
 
 		return true;
 	}
 
-	public boolean canEdit(Album album, Principal principal, MultipartFile musicImageFile,
-		@Valid AlbumEditRequest request, Member member) {
+	public boolean canEdit(Album album, Principal principal, @Valid AlbumEditRequest request, Member member) {
 		if (member == null)
 			return false;
 		if (!album.getMember().getUsername().equals(principal.getName()))
 			return false;
 		if (albumRepository.findByAlbumname(request.albumname()).isPresent() && !album.getAlbumname().equals(request.albumname()))
-			return false;
-		if (albumImageService.checkImageFile(musicImageFile))
 			return false;
 
 		return true;

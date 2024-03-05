@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
@@ -42,16 +40,15 @@ public class AlbumController {
 
 	@PostMapping("/release")
 	@PreAuthorize("isAuthenticated()")
-	public GlobalResponse releaseAlbum(@Valid AlbumCreateRequest request,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile, Principal principal) {
+	public GlobalResponse releaseAlbum(@Valid AlbumCreateRequest request, Principal principal) {
 
 		Member member = memberService.getMemberByUsername(principal.getName());
 
-		if (!albumService.canRelease(request.albumname(), musicImageFile, member)) {
+		if (!albumService.canRelease(request.albumname(), member)) {
 			throw new AlbumFieldException();
 		}
 
-		Album album = albumService.release(request, member, musicImageFile);
+		Album album = albumService.release(request, member);
 		return GlobalResponse.of("200", albumToResponseDto(album));
 	}
 
@@ -82,16 +79,15 @@ public class AlbumController {
 
 	@PutMapping("/{id}")
 	@PreAuthorize("isAuthenticated()")
-	public GlobalResponse editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile, Principal principal) {
+	public GlobalResponse editAlbum(@PathVariable long id, @Valid AlbumEditRequest request, Principal principal) {
 		Album album = albumService.getAlbumById(id);
 		Member member = memberService.getMemberByUsername(principal.getName());
 
-		if (!albumService.canEdit(album, principal, musicImageFile, request, member)) {
+		if (!albumService.canEdit(album, principal, request, member)) {
 			throw new AlbumFieldException();
 		}
 
-		Album editedAlbum = albumService.edit(request, album, musicImageFile);
+		Album editedAlbum = albumService.edit(request, album);
 		return GlobalResponse.of("200", albumToResponseDto(editedAlbum));
 	}
 
@@ -145,12 +141,7 @@ public class AlbumController {
 		return GlobalResponse.of("200");
 	}
 
-	private AlbumResponse albumToResponseDto(Album album) {
-		album = album.toBuilder()
-			//.filePath(albumService.getAlbumFileUrl(album.getFilePath()))
-			.imagePath(albumService.getAlbumImageUrl(album.getImagePath()))
-			.build();
-
+	public AlbumResponse albumToResponseDto(Album album) {
 		return AlbumResponse.builder()
 			.id(album.getId())
 			.albumname(album.getAlbumname())
