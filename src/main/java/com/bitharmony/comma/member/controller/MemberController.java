@@ -77,13 +77,13 @@ public class MemberController {
             Principal principal
     ) {
         Member member = memberService.getMemberByUsername(principal.getName());
-        String oldImagePath = member.getImagePath();
+        String oldImagePath = member.getImageUrl();
 
         MemberImageResponse memberImageResponse = profileImageService.uploadFile(file);
-        if (oldImagePath != null && !oldImagePath.equals("member-images/default_profile.jpg")) {
+        if (oldImagePath != null && !oldImagePath.equals(profileImageService.defaultProfileUrl)) {
             profileImageService.deleteFile(oldImagePath);
         }
-        memberService.setProfileImage(member, memberImageResponse.uploadFileUrl());
+        memberService.setProfileImage(member, memberImageResponse.profileImageUrl());
 
         return GlobalResponse.of(
                 "200",

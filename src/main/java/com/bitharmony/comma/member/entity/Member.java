@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,8 +46,7 @@ public class Member {
     @Column(length = 100)
     private String nickname;
 
-    @Builder.Default
-    private String imagePath = "member-images/default_profile.jpg";
+    private String imageUrl;
 
     @Builder.Default
     private Long credit = 0L;

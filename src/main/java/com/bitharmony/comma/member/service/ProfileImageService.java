@@ -19,67 +19,58 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ProfileImageService {
-	private final NcpProfileImageUtil ncpProfileImageUtil;
+    private final NcpProfileImageUtil ncpProfileImageUtil;
+    public String defaultProfileUrl = "https://kv6d2rdb2209.edge.naverncp.com/F82rLGPicA/default_profile.jpg?type=f&w=300&h=300&ttype=jpg";
 
-	public String getUuidFileName(String fileName) {
-		String ext = fileName.substring(fileName.indexOf(".") + 1);
-		return UUID.randomUUID() + "." + ext;
-	}
+    public String getUuidFileName(String fileName) {
+        String ext = fileName.substring(fileName.indexOf(".") + 1);
+        return UUID.randomUUID() + "." + ext;
+    }
 
-	public MemberImageResponse uploadFile(MultipartFile multipartFile) {
-		String originalFileName = multipartFile.getOriginalFilename();
-		String uploadFileName = getUuidFileName(originalFileName);
-		String uploadFileUrl = "";
+    public MemberImageResponse uploadFile(MultipartFile multipartFile) {
+        String originalFileName = multipartFile.getOriginalFilename();
+        String uploadFileName = getUuidFileName(originalFileName);
+        String imageUrl = "";
 
-		ObjectMetadata objectMetadata = new ObjectMetadata();
-		objectMetadata.setContentLength(multipartFile.getSize());
-		objectMetadata.setContentType(multipartFile.getContentType());
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(multipartFile.getSize());
+        objectMetadata.setContentType(multipartFile.getContentType());
 
-		try (InputStream inputStream = multipartFile.getInputStream()) {
-			String keyName = uploadFileName;
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            String keyName = uploadFileName;
 
-			// S3에 폴더 및 파일 업로드
-			ncpProfileImageUtil.getAmazonS3().putObject(
-					new PutObjectRequest(ncpProfileImageUtil.getBucketName(), keyName, inputStream, objectMetadata).withCannedAcl(
-							CannedAccessControlList.PublicRead));
+            // S3에 폴더 및 파일 업로드
+            ncpProfileImageUtil.getAmazonS3().putObject(
+                    new PutObjectRequest(ncpProfileImageUtil.getBucketName(), keyName, inputStream, objectMetadata).withCannedAcl(
+                            CannedAccessControlList.PublicRead));
 
-			// S3에 업로드한 폴더 및 파일 URL
-			uploadFileUrl = ncpProfileImageUtil.getBucketName() + "/" + keyName;
+            // 프로필 이미지 불러오는 Url
+            imageUrl = ncpProfileImageUtil.getMemberCdn() + "/" + keyName + ncpProfileImageUtil.getImageCdnQueryString();
 
-		} catch (IOException e) {
-			throw new UploadFailureException();
-		}
+        } catch (IOException e) {
+            throw new UploadFailureException();
+        }
 
-		return MemberImageResponse.builder()
-				.originalFileName(originalFileName)
-				.uploadFileName(uploadFileName)
-				.uploadFileUrl(uploadFileUrl)
-				.build();
-	}
+        return MemberImageResponse.builder()
+                .uploadFileName(uploadFileName)
+                .profileImageUrl(imageUrl)
+                .build();
+    }
 
 
-	public void deleteFile(String imagePath) {
-		String bucketName = imagePath.split("/")[0];
-		String fileName = imagePath.split("/")[1];
+    public void deleteFile(String imagePath) {
+        String fileName = imagePath
+                .replace(ncpProfileImageUtil.getMemberCdn(), "")
+                .substring(1)
+                .replace(ncpProfileImageUtil.getImageCdnQueryString(), "");
 
-		try{
-			ncpProfileImageUtil.getAmazonS3().deleteObject(
-					new DeleteObjectRequest(bucketName,fileName)
-			);
-		} catch (Exception e){
-			throw new DeleteFailureException();
-		}
-	}
-
-	private String subtractBucketName(String filepath, String bucketName) {
-		return filepath.replace(bucketName, "");
-	}
-	public String getProfileImageUrl(String imagePath) {
-		if (imagePath == null) {
-			return null;
-		}
-
-		return ncpProfileImageUtil.getMemberCdn() + subtractBucketName(imagePath, ncpProfileImageUtil.getBucketName())
-				+ ncpProfileImageUtil.getImageCdnQueryString();
-	}
+        try {
+            ncpProfileImageUtil.getAmazonS3().deleteObject(
+                    new DeleteObjectRequest(ncpProfileImageUtil.getBucketName(), fileName)
+            );
+            System.out.println("삭제완료");
+        } catch (Exception e) {
+            throw new DeleteFailureException();
+        }
+    }
 }

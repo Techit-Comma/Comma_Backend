@@ -83,6 +83,7 @@ public class MemberService {
                 .password(passwordEncoder.encode(password))
                 .email(email)
                 .nickname(nickname)
+                .imageUrl(profileImageService.defaultProfileUrl)
                 .build();
 
         memberRepository.save(member);
@@ -105,7 +106,7 @@ public class MemberService {
                 .username(findMember.getUsername())
                 .Email(findMember.getEmail())
                 .nickname(findMember.getNickname())
-                .profileImageUrl(profileImageService.getProfileImageUrl(findMember.getImagePath()))
+                .profileImageUrl(findMember.getImageUrl())
                 .build();
 
         return response;
@@ -119,7 +120,7 @@ public class MemberService {
                 .username(findMember.getUsername())
                 .Email(findMember.getEmail())
                 .nickname(findMember.getNickname())
-                .profileImageUrl(profileImageService.getProfileImageUrl(findMember.getImagePath()))
+                .profileImageUrl(findMember.getImageUrl())
                 .build();
     }
 
@@ -170,9 +171,9 @@ public class MemberService {
     }
 
     @Transactional
-    public void setProfileImage(Member member, String imagePath) {
+    public void setProfileImage(Member member, String imageUrl) {
         Member _member = member.toBuilder()
-                .imagePath(imagePath)
+                .imageUrl(imageUrl)
                 .build();
 
         memberRepository.save(_member);
