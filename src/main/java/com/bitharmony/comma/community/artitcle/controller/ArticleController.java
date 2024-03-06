@@ -112,6 +112,10 @@ public class ArticleController {
         Member member = memberService.getMemberByUsername(principal.getName());
         Member artist = memberService.getMemberByUsername(request.artistUsername());
 
+        if(member != artist){
+            throw new NotAuthorizedException();
+        }
+
         Article article = articleService.write(member, request.category(), request.title(), request.content(), artist);
 
         return GlobalResponse.of(
