@@ -15,7 +15,8 @@ public record GoogleMemberInfo(
         return Member.builder()
                 .username(BASIC_NAME + sub)
                 .email(email)
-                .nickname(BASIC_NAME + sub)
+                .nickname(name + "_" + sub)
+                .imageUrl(picture)
                 .provider(PROVIDER)
                 .providerId(sub)
                 .build();
