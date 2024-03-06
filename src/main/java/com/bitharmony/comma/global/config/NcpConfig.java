@@ -37,6 +37,7 @@ public class NcpConfig {
 		private final String endPoint;
 		private final String stack;
 		private final String imageBucket;
+		private final String profileImageBucket;
 		private final String musicBucket;
 		private final String musicPath;
 	}
@@ -44,7 +45,8 @@ public class NcpConfig {
 	@Getter
 	@RequiredArgsConstructor
 	public static class ImageOptimizer {
-		private final String cdn;
+		private final String albumCdn;
+		private final String memberCdn;
 		private final String queryString;
 	}
 

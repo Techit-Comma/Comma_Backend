@@ -29,6 +29,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
+    private final ProfileImageService profileImageService;
 
     public MemberLoginResponse login(String username, String password) {
         Member member = getMemberByUsername(username);
@@ -82,6 +83,7 @@ public class MemberService {
                 .password(passwordEncoder.encode(password))
                 .email(email)
                 .nickname(nickname)
+                .imageUrl(profileImageService.defaultProfileUrl)
                 .build();
 
         memberRepository.save(member);
@@ -104,6 +106,7 @@ public class MemberService {
                 .username(findMember.getUsername())
                 .Email(findMember.getEmail())
                 .nickname(findMember.getNickname())
+                .profileImageUrl(findMember.getImageUrl())
                 .build();
 
         return response;
@@ -113,13 +116,12 @@ public class MemberService {
 
         Member findMember = getMemberByUsername(username);
 
-        MemberReturnResponse response = MemberReturnResponse.builder()
+        return MemberReturnResponse.builder()
                 .username(findMember.getUsername())
                 .Email(findMember.getEmail())
                 .nickname(findMember.getNickname())
+                .profileImageUrl(findMember.getImageUrl())
                 .build();
-
-        return response;
     }
 
     @Transactional
@@ -153,7 +155,7 @@ public class MemberService {
 
         member = member.toBuilder()
                 .password(passwordEncoder.encode(password))
-                 .build();
+                .build();
 
         memberRepository.save(member);
     }
@@ -162,9 +164,19 @@ public class MemberService {
         return (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    public void updateCredit(String username, Long updatedCredit){
+    @Transactional
+    public void updateCredit(String username, Long updatedCredit) {
         Member member = getMemberByUsername(username);
         memberRepository.save(member.toBuilder().credit(updatedCredit).build());
+    }
+
+    @Transactional
+    public void setProfileImage(Member member, String imageUrl) {
+        Member _member = member.toBuilder()
+                .imageUrl(imageUrl)
+                .build();
+
+        memberRepository.save(_member);
     }
 
 }
