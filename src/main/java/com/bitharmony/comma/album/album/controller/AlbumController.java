@@ -17,6 +17,7 @@ import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
+import com.bitharmony.comma.album.album.exception.AlbumBuyException;
 import com.bitharmony.comma.album.album.exception.AlbumFieldException;
 import com.bitharmony.comma.album.album.exception.AlbumPermissionException;
 import com.bitharmony.comma.album.album.service.AlbumLikeService;
@@ -113,7 +114,7 @@ public class AlbumController {
 		return GlobalResponse.of("200", albumLikeService.canLike(member, album));
 	}
 
-	@PostMapping(value = "/{albumId}/like")
+	@PostMapping("/{albumId}/like")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalResponse like(@PathVariable long albumId, Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
@@ -127,7 +128,7 @@ public class AlbumController {
 		return GlobalResponse.of("200");
 	}
 
-	@PostMapping(value = "/{albumId}/cancelLike")
+	@PostMapping("/{albumId}/cancelLike")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalResponse cancelLike(@PathVariable long albumId, Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
@@ -139,6 +140,27 @@ public class AlbumController {
 
 		albumLikeService.like(member, album);
 		return GlobalResponse.of("200");
+	}
+
+	@PostMapping("/{albumId}/buy")
+	@PreAuthorize("isAuthenticated()")
+	public GlobalResponse buyAlbum(@PathVariable long albumId, Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		Album album = albumService.getAlbumById(albumId);
+
+		if (!albumService.canBuy(member, album)) {
+			throw new AlbumBuyException();
+		}
+
+		memberService.updateUserAlbum(member, album);
+		return GlobalResponse.of("200");
+	}
+
+	@GetMapping("/myAlbum")
+	@PreAuthorize("isAuthenticated()")
+		public GlobalResponse getMyAlbum(Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		return GlobalResponse.of("200", member.getAlbumList().stream().map(this::albumToResponseDto).toList());
 	}
 
 	public AlbumResponse albumToResponseDto(Album album) {

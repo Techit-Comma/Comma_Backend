@@ -1,18 +1,20 @@
 package com.bitharmony.comma.member.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.member.follow.entity.Follow;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
-import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -56,4 +58,6 @@ public class Member {
     @OneToMany(mappedBy = "follower")
     private List<Follow> followingList = new ArrayList<>();
 
+    @OneToMany
+    private List<Album> albumList = new ArrayList<>();
 }

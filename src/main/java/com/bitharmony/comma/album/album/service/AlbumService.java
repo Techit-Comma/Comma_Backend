@@ -10,7 +10,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bitharmony.comma.album.Image.service.AlbumImageService;
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
@@ -20,6 +19,7 @@ import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.service.MemberService;
 import com.bitharmony.comma.streaming.util.NcpMusicUtil;
 
 import jakarta.validation.Valid;
@@ -28,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AlbumService {
-	private final AlbumImageService albumImageService;
 	private final AlbumRepository albumRepository;
+	private final MemberService memberService;
 	private final FileService fileService;
 	private final NcpImageUtil ncpImageUtil;
 	private final NcpMusicUtil ncpMusicUtil;
@@ -126,6 +126,17 @@ public class AlbumService {
 	public boolean canDelete(Album album, Principal principal) {
 		if (!album.getMember().getUsername().equals(principal.getName()))
 			return false;
+		return true;
+	}
+
+	public boolean canBuy(Member member, Album album) {
+		if (member.getCredit() < album.getPrice())
+			return false;
+		if (album.getMember().getUsername().equals(member.getUsername()))
+			return false;
+		if (!album.isPermit())
+			return false;
+
 		return true;
 	}
 }

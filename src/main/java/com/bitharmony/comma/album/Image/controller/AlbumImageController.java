@@ -11,10 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.Image.service.AlbumImageService;
-import com.bitharmony.comma.album.album.service.AlbumService;
 import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.global.response.GlobalResponse;
-import com.bitharmony.comma.member.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,9 +20,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/album")
 @RequiredArgsConstructor
 public class AlbumImageController {
-
-	private final MemberService memberService;
-	private final AlbumService albumService;
 	private final AlbumImageService albumImageService;
 	private final FileService fileService;
 

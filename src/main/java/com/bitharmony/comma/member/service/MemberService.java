@@ -1,5 +1,12 @@
 package com.bitharmony.comma.member.service;
 
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.global.exception.MemberDuplicateException;
 import com.bitharmony.comma.global.exception.MemberNotFoundException;
 import com.bitharmony.comma.global.security.SecurityUser;
@@ -12,13 +19,9 @@ import com.bitharmony.comma.member.exception.DuplicateNicknameException;
 import com.bitharmony.comma.member.exception.IncorrectPasswordException;
 import com.bitharmony.comma.member.exception.InvalidPasswordException;
 import com.bitharmony.comma.member.repository.MemberRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -167,4 +170,9 @@ public class MemberService {
         memberRepository.save(member.toBuilder().credit(updatedCredit).build());
     }
 
+    @Transactional
+    public void updateUserAlbum(Member member, Album album){
+        member.getAlbumList().add(album);
+        memberRepository.save(member);
+    }
 }
