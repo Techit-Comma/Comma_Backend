@@ -47,8 +47,8 @@ public class FileService {
 
 			// S3에 폴더 및 파일 업로드
 			ncpImageUtil.getAmazonS3().putObject(
-				new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata).withCannedAcl(
-					CannedAccessControlList.PublicRead));
+					new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata).withCannedAcl(
+							CannedAccessControlList.PublicRead));
 
 			// S3에 업로드한 폴더 및 파일 URL
 			uploadFileUrl = bucketName + "/" + keyName;
@@ -58,10 +58,10 @@ public class FileService {
 		}
 
 		return FileResponse.builder()
-			.originalFileName(originalFileName)
-			.uploadFileName(uploadFileName)
-			.uploadFileUrl(uploadFileUrl)
-			.build();
+				.originalFileName(originalFileName)
+				.uploadFileName(uploadFileName)
+				.uploadFileUrl(uploadFileUrl)
+				.build();
 	}
 
 	// public void updateFile(MultipartFile multipartFile, String filePath, String bucketName) {
