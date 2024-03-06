@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,6 @@ public class Member {
     @Column(length = 100)
     private String username;
 
-    @NotNull(message = "password은 필수 입력값입니다.")
     @Size(min = 5, max = 100)
     @Column(length = 100)
     private String password;
@@ -56,4 +54,8 @@ public class Member {
     @OneToMany(mappedBy = "follower")
     private List<Follow> followingList = new ArrayList<>();
 
+    @Builder.Default
+    private String provider = "COMMA";
+
+    private String providerId;
 }
