@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Builder(toBuilder = true)
@@ -17,9 +15,9 @@ public class ArticleImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer Id;
+    private Long Id;
 
-    private String imageUrls;
+    private String imageUrl;
 
     @ManyToOne
     private Article article;

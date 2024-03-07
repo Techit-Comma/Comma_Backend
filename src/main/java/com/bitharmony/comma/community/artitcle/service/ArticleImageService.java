@@ -4,11 +4,14 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.bitharmony.comma.community.artitcle.entity.Article;
+import com.bitharmony.comma.community.artitcle.entity.ArticleImage;
+import com.bitharmony.comma.community.artitcle.repository.ArticleImageRepository;
 import com.bitharmony.comma.community.artitcle.util.NcpArticleImageUtil;
-import com.bitharmony.comma.member.dto.MemberImageResponse;
-import com.bitharmony.comma.member.exception.DeleteFailureException;
+import com.bitharmony.comma.global.exception.community.DeleteArticleImageFailureException;
+import com.bitharmony.comma.global.exception.community.ImageNotFoundException;
+import com.bitharmony.comma.member.exception.DeleteOldProfileFailureException;
 import com.bitharmony.comma.member.exception.UploadFailureException;
-import com.bitharmony.comma.member.util.NcpProfileImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ArticleImageService {
     private final NcpArticleImageUtil ncpArticleImageUtil;
+    private final ArticleImageRepository articleImageRepository;
 
     public String getUuidFileName(String fileName) {
         String ext = fileName.substring(fileName.indexOf(".") + 1);
@@ -65,13 +69,30 @@ public class ArticleImageService {
                 .substring(1)
                 .replace(ncpArticleImageUtil.getImageCdnQueryString(), "");
 
+        System.out.println(fileName);
+
         try {
             ncpArticleImageUtil.getAmazonS3().deleteObject(
                     new DeleteObjectRequest(ncpArticleImageUtil.getBucketName(), fileName)
             );
             System.out.println("삭제완료");
         } catch (Exception e) {
-            throw new DeleteFailureException();
+            throw new DeleteArticleImageFailureException();
         }
+    }
+
+    public void saveImageUrl(Article article, String imageUrl) {
+        articleImageRepository.save(
+                ArticleImage.builder()
+                .article(article)
+                .imageUrl(imageUrl)
+                .build()
+        );
+    }
+
+    public void deleteArticleImage(String imageUrl) {
+        ArticleImage articleImage = articleImageRepository.findByImageUrl(imageUrl)
+                .orElseThrow(ImageNotFoundException::new);
+        articleImageRepository.delete(articleImage);
     }
 }

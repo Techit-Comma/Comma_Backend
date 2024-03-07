@@ -2,14 +2,13 @@ package com.bitharmony.comma.community.artitcle.controller;
 
 import com.bitharmony.comma.community.artitcle.dto.*;
 import com.bitharmony.comma.community.artitcle.entity.Article;
+import com.bitharmony.comma.community.artitcle.entity.ArticleImage;
 import com.bitharmony.comma.community.artitcle.service.ArticleImageService;
 import com.bitharmony.comma.community.artitcle.service.ArticleService;
 import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.global.response.GlobalResponse;
-import com.bitharmony.comma.member.dto.MemberImageResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -113,7 +113,8 @@ public class ArticleController {
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     public GlobalResponse<ArticleCreateResponse> createArticle(
-            @RequestBody @Valid ArticleCreateRequest request, Principal principal) {
+            @RequestBody @Valid ArticleCreateRequest request,
+            Principal principal) {
         Member member = memberService.getMemberByUsername(principal.getName());
         Member artist = memberService.getMemberByUsername(request.artistUsername());
 
@@ -126,7 +127,29 @@ public class ArticleController {
         return GlobalResponse.of(
                 "200",
                 ArticleCreateResponse.builder()
-                        .id(article.getId())
+                        .articleId(article.getId())
+                        .build()
+        );
+    }
+
+    @PostMapping("/images")
+    @PreAuthorize("isAuthenticated()")
+    public GlobalResponse<ArticleUploadImagesResponse> uploadImages(
+            @RequestParam("file") List<MultipartFile> files,
+            @RequestParam("articleId") Long articleId
+    ) {
+        List<String> imageUrls = new ArrayList<>();
+        Article article = articleService.getArticleById(articleId);
+        for(MultipartFile file: files) {
+            String imageUrl = articleImageService.uploadFile(file);
+            articleImageService.saveImageUrl(article, imageUrl);
+            imageUrls.add(imageUrl);
+        }
+
+        return GlobalResponse.of(
+                "200",
+                ArticleUploadImagesResponse.builder()
+                        .imageUrls(imageUrls)
                         .build()
         );
     }
@@ -164,6 +187,11 @@ public class ArticleController {
             throw new NotAuthorizedException();
         }
 
+        List<ArticleImage> articleImages = article.getImageUrl();
+        for(ArticleImage articleImage : articleImages) {
+            articleImageService.deleteFile(articleImage.getImageUrl());
+        }
+
         articleService.deleteArticle(id);
 
         return GlobalResponse.of(
@@ -171,26 +199,15 @@ public class ArticleController {
         );
     }
 
-
-    @PostMapping("/images")
+    @DeleteMapping("images/{imageUrl}")
     @PreAuthorize("isAuthenticated()")
-    public GlobalResponse<ArticleUploadImagesResponse> uploadImages(
-            @RequestParam("file") List<MultipartFile> files,
-            HttpServletRequest request
+    public GlobalResponse<Void> deleteArticleImage(
+            @PathVariable String imageUrl, Principal principal
     ) {
-        List<String> imageUrls = new ArrayList<>();
+            articleImageService.deleteFile(imageUrl);
+            articleImageService.deleteArticleImage(imageUrl);
 
-        for(MultipartFile file: files) {
-            String imageUrl = articleImageService.uploadFile(file);
-            imageUrls.add(imageUrl);
-        }
-
-        return GlobalResponse.of(
-                "200",
-                ArticleUploadImagesResponse.builder()
-                        .imageUrls(imageUrls)
-                        .build()
-        );
+            return GlobalResponse.of("204");
     }
 
 }
