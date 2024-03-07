@@ -3,6 +3,7 @@ package com.bitharmony.comma.community.artitcle.service;
 import com.bitharmony.comma.community.artitcle.dto.ArticleModifyRequest;
 import com.bitharmony.comma.community.artitcle.entity.Article;
 import com.bitharmony.comma.community.artitcle.repository.ArticleRepository;
+import com.bitharmony.comma.community.artitcle.util.NcpArticleImageUtil;
 import com.bitharmony.comma.global.exception.community.ArticleNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
