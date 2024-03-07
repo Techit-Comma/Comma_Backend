@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -90,9 +90,24 @@ public class ArticleImageService {
         );
     }
 
-    public void deleteArticleImage(String imageUrl) {
-        ArticleImage articleImage = articleImageRepository.findByImageUrl(imageUrl)
+    public void deleteArticleImage(Long imageId) {
+        ArticleImage articleImage = articleImageRepository.findById(imageId)
                 .orElseThrow(ImageNotFoundException::new);
         articleImageRepository.delete(articleImage);
+    }
+
+    public Map<Long, String> getArticleImageByArticleId(long articleId) {
+        List<ArticleImage> articleImages = articleImageRepository.findByArticleId(articleId);
+        Map<Long, String> imageUrls = new HashMap<>();
+        for(ArticleImage image : articleImages){
+            imageUrls.put(image.getId(), image.getImageUrl());
+        }
+
+        return imageUrls;
+    }
+
+    public ArticleImage getArticleImageById(long imageId) {
+        return articleImageRepository.findById(imageId)
+                .orElseThrow(ImageNotFoundException::new);
     }
 }

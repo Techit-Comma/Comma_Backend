@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,6 +41,7 @@ public class ArticleController {
     public GlobalResponse<ArticleGetResponse> getArticle(@PathVariable long id) {
 
         Article article = articleService.getArticleById(id);
+        Map<Long, String> imageUrls = articleImageService.getArticleImageByArticleId(id);
 
         return GlobalResponse.of(
                 "200",
@@ -49,6 +51,7 @@ public class ArticleController {
                         .category(article.getCategory())
                         .title(article.getTitle())
                         .content(article.getContent())
+                        .imageUrls(imageUrls)
                         .createDate(article.getCreateDate())
                         .modifyDate(article.getModifyDate())
                         .build()
@@ -199,13 +202,14 @@ public class ArticleController {
         );
     }
 
-    @DeleteMapping("images/{imageUrl}")
+    @DeleteMapping("/images/{imageId}")
     @PreAuthorize("isAuthenticated()")
     public GlobalResponse<Void> deleteArticleImage(
-            @PathVariable String imageUrl, Principal principal
+            @PathVariable long imageId, Principal principal
     ) {
-            articleImageService.deleteFile(imageUrl);
-            articleImageService.deleteArticleImage(imageUrl);
+        ArticleImage articleImage = articleImageService.getArticleImageById(imageId);
+            articleImageService.deleteFile(articleImage.getImageUrl());
+            articleImageService.deleteArticleImage(imageId);
 
             return GlobalResponse.of("204");
     }
