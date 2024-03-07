@@ -1,6 +1,7 @@
 package com.bitharmony.comma.member.entity;
 
 import com.bitharmony.comma.member.follow.entity.Follow;
+import com.bitharmony.comma.playlist.entity.Playlist;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -54,6 +55,9 @@ public class Member {
 
     @OneToMany(mappedBy = "follower")
     private List<Follow> followingList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "producer")
+    private List<Playlist> playlists = new ArrayList<>();
 
     @Builder.Default
     private String provider = "COMMA";
