@@ -67,7 +67,7 @@ public class AlbumController {
 		Member member = memberService.getMemberByUsername(username);
 
 		if (member == null) {
-			throw new MemberNotFoundException("존재하지 않는 회원입니다.");
+			throw new MemberNotFoundException();
 		}
 
 		 Page<AlbumListResponse> albumPage = albumService.getLatest20Albums(username);
