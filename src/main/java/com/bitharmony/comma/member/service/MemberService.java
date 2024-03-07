@@ -69,16 +69,16 @@ public class MemberService {
 
     @Transactional
     public void join(String username, String password, String passwordCheck, String email, String nickname) {
+        if (!password.equals(passwordCheck)) {
+            throw new InvalidPasswordException();
+        }
+
         if (memberRepository.findByUsername(username).isPresent()) {
-            throw new MemberDuplicateException("이미 존재하는 아이디입니다.");
+            throw new MemberDuplicateException();
         }
 
         if (memberRepository.findByNickname(nickname).isPresent()) {
             throw new DuplicateNicknameException();
-        }
-
-        if (!password.equals(passwordCheck)) {
-            throw new InvalidPasswordException();
         }
 
         Member member = Member.builder()
@@ -95,7 +95,7 @@ public class MemberService {
     public Member getMemberByUsername(String username) {
 
         Member findMember = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new MemberNotFoundException());
 
         return findMember;
     }
@@ -133,7 +133,7 @@ public class MemberService {
         SecurityUser user = getUser();
         long id = user.getId();
         Member findMember = memberRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+                .orElseThrow(MemberNotFoundException::new);
 
         if (memberRepository.findByNickname(nickname).isPresent()) {
             throw new DuplicateNicknameException();

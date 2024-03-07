@@ -2,10 +2,10 @@ package com.bitharmony.comma.global.exception;
 
 public class MemberNotFoundException extends CommaException {
 
-    private final static String MESSAGE = "존재하지 않는 유저입니다."; // 필요한 메시지 삽입.
+    private final static String MESSAGE = "존재하지 않는 회원입니다."; // 필요한 메시지 삽입.
 
-    public MemberNotFoundException(String message) { // 생성자
-        super(message);
+    public MemberNotFoundException() {
+        super(MESSAGE);
     }
 
     @Override
