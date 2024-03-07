@@ -18,11 +18,22 @@ public class OauthController {
 
     @GetMapping("/google")
     public String getGoogleLoginUrl() {
-        return oAuthService.getRegisterUrl();
+        return oAuthService.getGoogleRegisterUrl();
     }
 
     @GetMapping("/google/callback")
-    public GlobalResponse<MemberLoginResponse> loginToGoogleAccount(@RequestParam("code") String accessToken) {
-        return GlobalResponse.of("200", oAuthService.login(accessToken));
+    public GlobalResponse<MemberLoginResponse> loginToGoogleAccount(@RequestParam("code") String accessCode) {
+        return GlobalResponse.of("200", oAuthService.googleLogin(accessCode));
     }
+
+    @GetMapping("/github")
+    public String getGithubLoginUrl() {
+        return oAuthService.getGithubRegisterUrl();
+    }
+
+    @GetMapping("/github/callback")
+    public GlobalResponse<MemberLoginResponse> loginToGithubAccount(@RequestParam("code") String accessCode) {
+        return GlobalResponse.of("200", oAuthService.githubLogin(accessCode));
+    }
+
 }

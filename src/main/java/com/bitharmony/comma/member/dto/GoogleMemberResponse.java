@@ -2,7 +2,7 @@ package com.bitharmony.comma.member.dto;
 
 import com.bitharmony.comma.member.entity.Member;
 
-public record GoogleMemberInfo(
+public record GoogleMemberResponse(
         String sub,
         String name,
         String email,

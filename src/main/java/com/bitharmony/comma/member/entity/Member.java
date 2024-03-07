@@ -36,7 +36,6 @@ public class Member {
     @Column(length = 100)
     private String password;
 
-    @NotNull(message = "email은 필수 입력값입니다.")
     @Email
     private String email;
 

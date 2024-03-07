@@ -2,9 +2,12 @@ package com.bitharmony.comma.member.service;
 
 import com.bitharmony.comma.global.exception.MemberNotFoundException;
 import com.bitharmony.comma.global.exception.member.MemberInfoMappingException;
+import com.bitharmony.comma.global.provider.GithubAuthProvider;
 import com.bitharmony.comma.global.provider.GoogleAuthProvider;
 import com.bitharmony.comma.global.util.JwtUtil;
-import com.bitharmony.comma.member.dto.GoogleMemberInfo;
+import com.bitharmony.comma.member.dto.GithubMemberResponse;
+import com.bitharmony.comma.member.dto.GithubOauthResponse;
+import com.bitharmony.comma.member.dto.GoogleMemberResponse;
 import com.bitharmony.comma.member.dto.GoogleOauthResponse;
 import com.bitharmony.comma.member.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.dto.MemberLoginResponse;
@@ -16,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.Decoders;
 import jakarta.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,23 +31,34 @@ public class OAuthService {
 
     private final MemberRepository memberRepository;
     private final GoogleAuthProvider googleAuthProvider;
+    private final GithubAuthProvider githubAuthProvider;
     private final JwtUtil jwtUtil;
 
-    public String getRegisterUrl() {
+    public String getGoogleRegisterUrl() {
         return googleAuthProvider.generateRegisterUrl();
     }
 
+    public String getGithubRegisterUrl() {
+        return githubAuthProvider.generateRegisterUrl();
+    }
+
     @Transactional
-    public MemberLoginResponse login(String accessCode) {
-        GoogleMemberInfo googleMemberInfo = getGoogleMemberInfo(accessCode);
+    public MemberLoginResponse googleLogin(String accessCode) {
+        GoogleMemberResponse googleMemberResponse = getGoogleMemberInfo(accessCode);
+        Member member = getMemberByProviderId(googleMemberResponse.sub(), googleMemberResponse.toEntity());
 
-        if (memberRepository.findByProviderId(googleMemberInfo.sub()).isEmpty()) { // 회원 정보가 없다면, 등록 선 진행
-            memberRepository.save(googleMemberInfo.toEntity());
-        }
+        return getMemberLoginResponse(member);
+    }
 
-        Member member = memberRepository.findByProviderId(googleMemberInfo.sub())
-                .orElseThrow(MemberNotFoundException::new);
+    @Transactional
+    public MemberLoginResponse githubLogin(String accessCode) {
+        GithubMemberResponse githubMemberResponse = getGithubMemberInfo(accessCode);
+        Member member = getMemberByProviderId(githubMemberResponse.id(), githubMemberResponse.toEntity());
 
+        return getMemberLoginResponse(member);
+    }
+
+    private MemberLoginResponse getMemberLoginResponse(Member member) {
         JwtCreateRequest jwtCreateRequest = JwtCreateRequest.builder()
                 .id(member.getId())
                 .username(member.getUsername())
@@ -60,8 +75,25 @@ public class OAuthService {
                 .build();
     }
 
+    @Transactional
+    public Member getMemberByProviderId(String ProviderId, Member memberToEntity) {
+        Optional<Member> member = memberRepository.findByProviderId(ProviderId);
 
-    private GoogleMemberInfo getGoogleMemberInfo(String accessCode) {
+        if (member.isEmpty()) { // 회원 정보가 없다면, 등록 선 진행
+            memberRepository.save(memberToEntity);
+            return memberRepository.findByProviderId(ProviderId)
+                    .orElseThrow(MemberNotFoundException::new);
+        }
+
+        return member.get();
+    }
+
+    private GithubMemberResponse getGithubMemberInfo(String accessCode) {
+        GithubOauthResponse githubOauthResponse = githubAuthProvider.getAccessToken(accessCode);
+        return githubAuthProvider.getMemberInfo(githubOauthResponse.access_token());
+    }
+
+    private GoogleMemberResponse getGoogleMemberInfo(String accessCode) {
         GoogleOauthResponse googleOauthResponse = googleAuthProvider.getUserInfo(accessCode);
         String userInfo = decryptBase64Token(googleOauthResponse.id_token().split("\\.")[1]);
 
@@ -73,12 +105,12 @@ public class OAuthService {
         return new String(decode, StandardCharsets.UTF_8);
     }
 
-    private GoogleMemberInfo transJsonToMember(String json) {
+    private GoogleMemberResponse transJsonToMember(String json) {
         try {
             ObjectMapper objectMapper = new ObjectMapper()
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-            return objectMapper.readValue(json, GoogleMemberInfo.class);
+            return objectMapper.readValue(json, GoogleMemberResponse.class);
 
         } catch (JsonProcessingException e) {
             throw new MemberInfoMappingException();
