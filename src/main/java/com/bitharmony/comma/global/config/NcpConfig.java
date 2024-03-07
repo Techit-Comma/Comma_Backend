@@ -37,6 +37,7 @@ public class NcpConfig {
 		private final String endPoint;
 		private final String stack;
 		private final String imageBucket;
+		private final String profileImageBucket;
 		private final String musicBucket;
 		private final String musicPath;
 	}
