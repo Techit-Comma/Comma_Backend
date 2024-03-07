@@ -1,6 +1,7 @@
 package com.bitharmony.comma.album.album.service;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -101,6 +102,10 @@ public class AlbumService {
 
 		return ncpImageUtil.getImageCdn() + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "")
 			+ ncpImageUtil.getImageCdnQueryString();
+	}
+
+	public Page<Album> search(List<String> kwTypes, String kw, Pageable pageable) {
+		return albumRepository.search(kwTypes, kw, pageable);
 	}
 
 	public boolean canRelease(String name, Member member) {

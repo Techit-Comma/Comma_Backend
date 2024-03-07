@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
+import com.bitharmony.comma.album.album.dto.AlbumFindRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
@@ -161,6 +162,11 @@ public class AlbumController {
 		public GlobalResponse getMyAlbum(Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
 		return GlobalResponse.of("200", member.getAlbumList().stream().map(this::albumToResponseDto).toList());
+	}
+
+	@GetMapping("/list")
+	public String list(@Valid AlbumFindRequest request) {
+		return null;
 	}
 
 	public AlbumResponse albumToResponseDto(Album album) {
