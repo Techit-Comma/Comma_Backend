@@ -9,6 +9,7 @@ import lombok.Builder;
 @Builder
 public record AlbumCreateRequest(@NotEmpty(message = "앨범 이름을 입력해주세요.") @Size(max = 50) String albumname,
 								 @NotEmpty(message = "앨범 파일은 필수입니다.") String filePath,
+								 String imgPath,
 								 String genre,
 								 boolean license,
 								 String licenseDescription,
@@ -19,6 +20,7 @@ public record AlbumCreateRequest(@NotEmpty(message = "앨범 이름을 입력해
 		return Album.builder()
 			.albumname(albumname)
 			.filePath(filePath)
+			.imagePath(imgPath)
 			.genre(genre)
 			.license(license)
 			.licenseDescription(licenseDescription)

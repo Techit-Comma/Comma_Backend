@@ -10,15 +10,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
+import com.bitharmony.comma.album.album.exception.AlbumBuyException;
 import com.bitharmony.comma.album.album.exception.AlbumFieldException;
 import com.bitharmony.comma.album.album.exception.AlbumPermissionException;
 import com.bitharmony.comma.album.album.service.AlbumLikeService;
@@ -42,16 +41,15 @@ public class AlbumController {
 
 	@PostMapping("/release")
 	@PreAuthorize("isAuthenticated()")
-	public GlobalResponse releaseAlbum(@Valid AlbumCreateRequest request,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile, Principal principal) {
+	public GlobalResponse releaseAlbum(@Valid AlbumCreateRequest request, Principal principal) {
 
 		Member member = memberService.getMemberByUsername(principal.getName());
 
-		if (!albumService.canRelease(request.albumname(), musicImageFile, member)) {
+		if (!albumService.canRelease(request.albumname(), member)) {
 			throw new AlbumFieldException();
 		}
 
-		Album album = albumService.release(request, member, musicImageFile);
+		Album album = albumService.release(request, member);
 		return GlobalResponse.of("200", albumToResponseDto(album));
 	}
 
@@ -82,16 +80,15 @@ public class AlbumController {
 
 	@PutMapping("/{id}")
 	@PreAuthorize("isAuthenticated()")
-	public GlobalResponse editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile, Principal principal) {
+	public GlobalResponse editAlbum(@PathVariable long id, @Valid AlbumEditRequest request, Principal principal) {
 		Album album = albumService.getAlbumById(id);
 		Member member = memberService.getMemberByUsername(principal.getName());
 
-		if (!albumService.canEdit(album, principal, musicImageFile, request, member)) {
+		if (!albumService.canEdit(album, principal, request, member)) {
 			throw new AlbumFieldException();
 		}
 
-		Album editedAlbum = albumService.edit(request, album, musicImageFile);
+		Album editedAlbum = albumService.edit(request, album);
 		return GlobalResponse.of("200", albumToResponseDto(editedAlbum));
 	}
 
@@ -117,7 +114,7 @@ public class AlbumController {
 		return GlobalResponse.of("200", albumLikeService.canLike(member, album));
 	}
 
-	@PostMapping(value = "/{albumId}/like")
+	@PostMapping("/{albumId}/like")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalResponse like(@PathVariable long albumId, Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
@@ -131,7 +128,7 @@ public class AlbumController {
 		return GlobalResponse.of("200");
 	}
 
-	@PostMapping(value = "/{albumId}/cancelLike")
+	@PostMapping("/{albumId}/cancelLike")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalResponse cancelLike(@PathVariable long albumId, Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
@@ -145,12 +142,28 @@ public class AlbumController {
 		return GlobalResponse.of("200");
 	}
 
-	private AlbumResponse albumToResponseDto(Album album) {
-		album = album.toBuilder()
-			//.filePath(albumService.getAlbumFileUrl(album.getFilePath()))
-			.imagePath(albumService.getAlbumImageUrl(album.getImagePath()))
-			.build();
+	@PostMapping("/{albumId}/buy")
+	@PreAuthorize("isAuthenticated()")
+	public GlobalResponse buyAlbum(@PathVariable long albumId, Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		Album album = albumService.getAlbumById(albumId);
 
+		if (!albumService.canBuy(member, album)) {
+			throw new AlbumBuyException();
+		}
+
+		memberService.updateUserAlbum(member, album);
+		return GlobalResponse.of("200");
+	}
+
+	@GetMapping("/myAlbum")
+	@PreAuthorize("isAuthenticated()")
+		public GlobalResponse getMyAlbum(Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		return GlobalResponse.of("200", member.getAlbumList().stream().map(this::albumToResponseDto).toList());
+	}
+
+	public AlbumResponse albumToResponseDto(Album album) {
 		return AlbumResponse.builder()
 			.id(album.getId())
 			.albumname(album.getAlbumname())
