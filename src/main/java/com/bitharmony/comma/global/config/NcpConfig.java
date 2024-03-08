@@ -38,6 +38,7 @@ public class NcpConfig {
 		private final String stack;
 		private final String imageBucket;
 		private final String profileImageBucket;
+		private final String articleImageBucket;
 		private final String musicBucket;
 		private final String musicPath;
 	}
@@ -47,6 +48,7 @@ public class NcpConfig {
 	public static class ImageOptimizer {
 		private final String albumCdn;
 		private final String memberCdn;
+		private final String articleCdn;
 		private final String queryString;
 	}
 

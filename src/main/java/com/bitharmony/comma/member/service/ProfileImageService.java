@@ -5,7 +5,7 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.bitharmony.comma.member.dto.MemberImageResponse;
-import com.bitharmony.comma.member.exception.DeleteFailureException;
+import com.bitharmony.comma.member.exception.DeleteOldProfileFailureException;
 import com.bitharmony.comma.member.exception.UploadFailureException;
 import com.bitharmony.comma.member.util.NcpProfileImageUtil;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +70,7 @@ public class ProfileImageService {
             );
             System.out.println("삭제완료");
         } catch (Exception e) {
-            throw new DeleteFailureException();
+            throw new DeleteOldProfileFailureException();
         }
     }
 }
