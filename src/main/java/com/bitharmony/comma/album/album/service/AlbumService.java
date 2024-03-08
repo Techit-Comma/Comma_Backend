@@ -1,5 +1,6 @@
 package com.bitharmony.comma.album.album.service;
 
+import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -31,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class AlbumService {
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
+	private final AlbumConvertUtil albumConvertUtil;
 	private final NcpImageUtil ncpImageUtil;
 	private final NcpMusicUtil ncpMusicUtil;
 
@@ -79,37 +81,7 @@ public class AlbumService {
 			.map(u -> albumRepository.findFirst20ByMemberUsernameOrderByIdDesc(u, topTwenty))
 			.orElse(albumRepository.findFirst20ByOrderByIdDesc(topTwenty));
 
-		return albums.map(this::convertToDto);
-	}
-
-	public AlbumListResponse convertToDto(Album album) {
-		return AlbumListResponse.builder()
-			.id(album.getId())
-			.albumname(album.getAlbumname())
-			.genre(album.getGenre())
-			.imgPath(getAlbumImageUrl(album.getImagePath()))
-			.permit(album.isPermit())
-			.price(album.getPrice())
-			.artistUsername(album.getMember().getUsername())
-			.artistNickname(album.getMember().getNickname())
-			.build();
-	}
-
-	private String replaceBucketName(String filepath, String bucketName, String replacement) {
-		return filepath.replace(bucketName, replacement);
-	}
-
-	public String getAlbumImageUrl(String filepath) {
-		if (filepath == null) {
-			return null;
-		}
-
-		return ncpImageUtil.getImageCdn() + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "")
-			+ ncpImageUtil.getImageCdnQueryString();
-	}
-
-	public String getAlbumFileUrl(String filepath) {
-		return ncpImageUtil.getEndPoint() + "/" + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "");
+		return albums.map(albumConvertUtil::convertToDto);
 	}
 
 	public boolean canRelease(String name, MultipartFile musicImageFile, Member member) {

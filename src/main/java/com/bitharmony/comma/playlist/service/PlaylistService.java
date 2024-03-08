@@ -2,8 +2,7 @@ package com.bitharmony.comma.playlist.service;
 
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
-import com.bitharmony.comma.album.album.repository.AlbumRepository;
-import com.bitharmony.comma.album.album.service.AlbumService;
+import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.global.exception.playlist.PlaylistAlbumNotFoundException;
 import com.bitharmony.comma.global.exception.playlist.PlaylistNotFoundException;
@@ -24,7 +23,7 @@ public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final PlaylistAlbumRepository playlistAlbumRepository;
 
-    private final AlbumService albumService; // TODO: 리팩토링 필요
+    private final AlbumConvertUtil albumConvertUtil; // TODO: 리팩토링 필요
 
     @Transactional
     public void createPlaylist(String title, Member member) {
@@ -39,7 +38,7 @@ public class PlaylistService {
     @Transactional
     public List<AlbumListResponse> getAlbumList(Long playlistId) {
         List<Album> playListAlbums = playlistAlbumRepository.findAllByPlaylistId(playlistId);
-        return playListAlbums.stream().map(albumService::convertToDto).toList();
+        return playListAlbums.stream().map(albumConvertUtil::convertToDto).toList();
     }
 
     @Transactional
