@@ -2,11 +2,13 @@ package com.bitharmony.comma.playlist.service;
 
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
+import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.global.exception.playlist.PlaylistAlbumNotFoundException;
 import com.bitharmony.comma.global.exception.playlist.PlaylistNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.playlist.dto.PlaylistResponse;
 import com.bitharmony.comma.playlist.entity.PlayListAlbum;
 import com.bitharmony.comma.playlist.entity.Playlist;
 import com.bitharmony.comma.playlist.repository.PlaylistAlbumRepository;
@@ -22,8 +24,8 @@ public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
     private final PlaylistAlbumRepository playlistAlbumRepository;
-
-    private final AlbumConvertUtil albumConvertUtil; // TODO: 리팩토링 필요
+    private final AlbumRepository albumRepository;
+    private final AlbumConvertUtil albumConvertUtil;
 
     @Transactional
     public void createPlaylist(String title, Member member) {
@@ -36,9 +38,22 @@ public class PlaylistService {
     }
 
     @Transactional
-    public List<AlbumListResponse> getAlbumList(Long playlistId) {
-        List<Album> playListAlbums = playlistAlbumRepository.findAllByPlaylistId(playlistId);
-        return playListAlbums.stream().map(albumConvertUtil::convertToDto).toList();
+    public PlaylistResponse getAlbumList(Long playlistId) {
+        Playlist playlist = getPlaylistById(playlistId);
+        List<PlayListAlbum> playListAlbums = playlistAlbumRepository.findAllByPlaylistId(playlistId);
+
+        List<Long> albumIds = playListAlbums.stream()
+                .map(playListAlbum -> playListAlbum.getAlbum().getId())
+                .toList();
+
+        List<Album> albums = albumRepository.findAllById(albumIds);
+
+        return PlaylistResponse.builder()
+                .title(playlist.getTitle())
+                .producerUsername(playlist.getProducer().getUsername())
+                .producerNickname(playlist.getProducer().getNickname()) // TODO: Album 정보 넘길 시에도 같은 형식으로 넘기기에 리팩토링 필요
+                .albumList(albums.stream().map(albumConvertUtil::convertToDto).toList())
+                .build();
     }
 
     @Transactional
@@ -46,10 +61,11 @@ public class PlaylistService {
         Playlist playlist = getPlaylistById(playlistId);
         checkPlaylistProducer(playlist.getProducer().getId(), member.getId());
 
-        playlist.toBuilder()
-                .title(title);
+        Playlist _playlist = playlist.toBuilder()
+                .title(title)
+                .build();
 
-        playlistRepository.save(playlist);
+        playlistRepository.save(_playlist);
     }
 
     @Transactional

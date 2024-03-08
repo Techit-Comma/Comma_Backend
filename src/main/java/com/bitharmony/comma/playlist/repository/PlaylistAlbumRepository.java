@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PlaylistAlbumRepository extends JpaRepository<PlayListAlbum, Long> {
 
-    List<Album> findAllByPlaylistId(Long playlistId);
+    List<PlayListAlbum> findAllByPlaylistId(Long playlistId);
     Optional<PlayListAlbum> findByPlaylistIdAndAlbumId(Long playlistId, Long albumId);
     void deleteByPlaylistId(Long playlistId);
 }

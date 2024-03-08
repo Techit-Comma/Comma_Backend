@@ -1,6 +1,5 @@
 package com.bitharmony.comma.playlist.controller;
 
-import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.service.AlbumService;
 import com.bitharmony.comma.global.response.GlobalResponse;
@@ -8,9 +7,9 @@ import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
 import com.bitharmony.comma.playlist.dto.PlaylistAlbumRequest;
 import com.bitharmony.comma.playlist.dto.PlaylistRequest;
+import com.bitharmony.comma.playlist.dto.PlaylistResponse;
 import com.bitharmony.comma.playlist.service.PlaylistService;
 import java.security.Principal;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,7 +38,7 @@ public class PlayListController {
 
 
     @GetMapping("/{playlistId}")
-    public GlobalResponse<List<AlbumListResponse>> getPlaylist(@PathVariable Long playlistId) {
+    public GlobalResponse<PlaylistResponse> getPlaylist(@PathVariable Long playlistId) {
         return GlobalResponse.of("200", playlistService.getAlbumList(playlistId));
     }
 
