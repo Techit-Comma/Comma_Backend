@@ -7,9 +7,11 @@ import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
 import com.bitharmony.comma.playlist.dto.PlaylistAlbumRequest;
 import com.bitharmony.comma.playlist.dto.PlaylistRequest;
+import com.bitharmony.comma.playlist.dto.PlaylistDetailResponse;
 import com.bitharmony.comma.playlist.dto.PlaylistResponse;
 import com.bitharmony.comma.playlist.service.PlaylistService;
 import java.security.Principal;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,9 +38,15 @@ public class PlayListController {
         playlistService.createPlaylist(playlistRequest.title(), member);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping
+    public GlobalResponse<List<PlaylistResponse>> getAllPlaylist(Principal principal) {
+        Member member = memberService.getMemberByUsername(principal.getName());
+        return GlobalResponse.of("200", playlistService.getAllPlaylist(member));
+    }
 
     @GetMapping("/{playlistId}")
-    public GlobalResponse<PlaylistResponse> getPlaylist(@PathVariable Long playlistId) {
+    public GlobalResponse<PlaylistDetailResponse> getPlaylist(@PathVariable Long playlistId) {
         return GlobalResponse.of("200", playlistService.getAlbumList(playlistId));
     }
 

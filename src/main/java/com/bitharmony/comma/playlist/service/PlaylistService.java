@@ -1,6 +1,5 @@
 package com.bitharmony.comma.playlist.service;
 
-import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
@@ -8,6 +7,7 @@ import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.global.exception.playlist.PlaylistAlbumNotFoundException;
 import com.bitharmony.comma.global.exception.playlist.PlaylistNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.playlist.dto.PlaylistDetailResponse;
 import com.bitharmony.comma.playlist.dto.PlaylistResponse;
 import com.bitharmony.comma.playlist.entity.PlayListAlbum;
 import com.bitharmony.comma.playlist.entity.Playlist;
@@ -38,7 +38,19 @@ public class PlaylistService {
     }
 
     @Transactional
-    public PlaylistResponse getAlbumList(Long playlistId) {
+    public List<PlaylistResponse> getAllPlaylist(Member member) {
+        List<Playlist> playlists = playlistRepository.findAllByProducerId(member.getId());
+
+        return playlists.stream()
+                .map(playlist -> convertToPlaylistResponse(
+                        playlist,
+                        member.getUsername(),
+                        member.getNickname()
+                )).toList();
+    }
+
+    @Transactional
+    public PlaylistDetailResponse getAlbumList(Long playlistId) {
         Playlist playlist = getPlaylistById(playlistId);
         List<PlayListAlbum> playListAlbums = playlistAlbumRepository.findAllByPlaylistId(playlistId);
 
@@ -48,7 +60,7 @@ public class PlaylistService {
 
         List<Album> albums = albumRepository.findAllById(albumIds);
 
-        return PlaylistResponse.builder()
+        return PlaylistDetailResponse.builder()
                 .title(playlist.getTitle())
                 .producerUsername(playlist.getProducer().getUsername())
                 .producerNickname(playlist.getProducer().getNickname()) // TODO: Album 정보 넘길 시에도 같은 형식으로 넘기기에 리팩토링 필요
@@ -111,6 +123,15 @@ public class PlaylistService {
         if (!producerId.equals(memberId)) {
             throw new NotAuthorizedException();
         }
+    }
+
+    private PlaylistResponse convertToPlaylistResponse(Playlist playlist, String producerUsername, String producerNickname) {
+        return PlaylistResponse.builder()
+                .playlistId(playlist.getId())
+                .title(playlist.getTitle())
+                .producerUsername(producerNickname)
+                .producerNickname(producerUsername)
+                .build();
     }
 
 }

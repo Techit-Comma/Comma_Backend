@@ -5,11 +5,11 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record PlaylistResponse(
-        Long playlistId,
+public record PlaylistDetailResponse(
         String title,
         String producerUsername,
-        String producerNickname
+        String producerNickname,
+        List<AlbumListResponse> albumList
 ) {
 
 }
