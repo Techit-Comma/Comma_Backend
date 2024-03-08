@@ -18,32 +18,30 @@ public class AlbumConvertUtil {
                 .id(album.getId())
                 .albumname(album.getAlbumname())
                 .genre(album.getGenre())
-                .imgPath(ncpImageUtil.getAlbumImageUrl(album.getImagePath()))
-                .permit(album.isPermit())
-                .price(album.getPrice())
+                .fileUrl(album.getFilePath()) // TODO: file URL로 변경하기 + NCP MusicUtil과 설정 통합
+                .imgUrl(convertAlbumImageUrl(album.getImagePath()))
                 .artistUsername(album.getMember().getUsername())
                 .artistNickname(album.getMember().getNickname())
                 .build();
     }
 
     public AlbumResponse albumToResponseDto(Album album) {
-        album = album.toBuilder()
-                //.filePath(albumService.getAlbumFileUrl(album.getFilePath()))
-                .imagePath(ncpImageUtil.getAlbumImageUrl(album.getImagePath()))
-                .build();
-
         return AlbumResponse.builder()
                 .id(album.getId())
                 .albumname(album.getAlbumname())
                 .genre(album.getGenre())
                 .license(album.isLicense())
                 .licenseDescription(album.getLicenseDescription())
-                .imgPath(album.getImagePath())
-                .filePath(album.getFilePath())
+                .imgUrl(convertAlbumImageUrl(album.getImagePath()))
+                .fileUrl(album.getFilePath())
                 .permit(album.isPermit())
                 .price(album.getPrice())
                 .artistNickname(album.getMember().getNickname())
                 .artistUsername(album.getMember().getUsername())
                 .build();
+    }
+
+    private String convertAlbumImageUrl(String imagePath) {
+        return ncpImageUtil.getAlbumImageUrl(imagePath);
     }
 }
