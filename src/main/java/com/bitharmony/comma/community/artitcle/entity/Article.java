@@ -30,7 +30,7 @@ public class Article {
     @NotNull
     private Member artist;
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments;
 
     @Enumerated(EnumType.STRING)
@@ -41,6 +41,9 @@ public class Article {
 
     @NotNull
     private String content;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ArticleImage> imageUrl;
 
     @Builder.Default
     private LocalDateTime createDate = LocalDateTime.now();
