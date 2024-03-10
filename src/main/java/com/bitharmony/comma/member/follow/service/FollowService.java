@@ -4,7 +4,7 @@ import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.follow.exception.DuplicateFollowException;
 import com.bitharmony.comma.member.follow.exception.FollowNotFoundException;
 import com.bitharmony.comma.member.follow.exception.SelfFollowException;
-import com.bitharmony.comma.member.follow.dto.FollowingListReturnResponse;
+import com.bitharmony.comma.member.follow.dto.FollowingListResponse;
 import com.bitharmony.comma.member.follow.entity.Follow;
 import com.bitharmony.comma.member.follow.repository.FollowRepository;
 import com.bitharmony.comma.member.service.MemberService;
@@ -60,17 +60,16 @@ public class FollowService {
         followRepository.delete(follow);
     }
 
-    public FollowingListReturnResponse getAllFollowingList() {
+    public List<FollowingListResponse> getAllFollowingList() {
         String username = memberService.getUser().getUsername();
         Member findMember = memberService.getMemberByUsername(username);
 
-        List<String> followingList = findMember.getFollowingList().stream()
-                .map((follow) -> follow.getFollowing().getUsername()).toList();
+        return findMember.getFollowingList().stream()
+                .map((follow) -> FollowingListResponse.fromEntity(follow.getFollowing())).toList();
+    }
 
-        FollowingListReturnResponse response = FollowingListReturnResponse.builder()
-                .followingList(followingList)
-                .build();
-
-        return response;
+    public List<Member> getAllFollowerList(Member caller) {
+        return caller.getFollowerList().stream()
+                .map(Follow::getFollower).toList();
     }
 }

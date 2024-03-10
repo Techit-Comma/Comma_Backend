@@ -1,8 +1,9 @@
 package com.bitharmony.comma.member.follow.controller;
 
 import com.bitharmony.comma.global.response.GlobalResponse;
-import com.bitharmony.comma.member.follow.dto.FollowingListReturnResponse;
+import com.bitharmony.comma.member.follow.dto.FollowingListResponse;
 import com.bitharmony.comma.member.follow.service.FollowService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class FollowController {
 
     @GetMapping
     public GlobalResponse getAllFollowing() {
-        FollowingListReturnResponse response = followService.getAllFollowingList();
+        List<FollowingListResponse> response = followService.getAllFollowingList();
         return GlobalResponse.of("200", response);
     }
 }
