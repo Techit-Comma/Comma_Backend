@@ -35,12 +35,10 @@ public class Member {
     @Column(length = 100)
     private String username;
 
-    @NotNull(message = "password은 필수 입력값입니다.")
     @Size(min = 5, max = 100)
     @Column(length = 100)
     private String password;
 
-    @NotNull(message = "email은 필수 입력값입니다.")
     @Email
     private String email;
 
@@ -59,6 +57,11 @@ public class Member {
 
     @OneToMany(mappedBy = "follower")
     private List<Follow> followingList = new ArrayList<>();
+
+    @Builder.Default
+    private String provider = "COMMA";
+
+    private String providerId;
 
     @OneToMany
     private List<Album> albumList = new ArrayList<>();

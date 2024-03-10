@@ -15,6 +15,8 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -85,5 +87,48 @@ public class AlbumRepositoryImpl implements AlbumRepositoryCustom{
 			.where(builder);
 
 		return PageableExecutionUtils.getPage(albumsQuery.fetch(), pageable, totalQuery::fetchOne);
+	}
+
+	@Override
+	public Page<Album> streamingTop10Albums(Pageable pageable) {
+		QAlbum album = QAlbum.album;
+		QMember member = QMember.member;
+
+		JPAQuery<Album> query = jpaQueryFactory
+			.select(album)
+			.from(album)
+			.leftJoin(album.member, member)
+			.orderBy(album.streamingCounts.size().desc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize());
+
+		JPAQuery<Long> totalQuery = jpaQueryFactory
+			.select(album.count())
+			.from(album)
+			.leftJoin(album.member, member);
+		return PageableExecutionUtils.getPage(query.fetch(), pageable, totalQuery::fetchOne);
+	}
+
+	@Override
+	public Page<Album> musicRecommendation10Albums(String userName,Pageable pageable) {
+		QAlbum album = QAlbum.album;
+		QMember member = QMember.member;
+
+		NumberExpression<Double> rand = Expressions.numberTemplate(Double.class, "rand()");
+		OrderSpecifier<Double> orderSpecifier = new OrderSpecifier<>(Order.ASC, rand);
+
+		JPAQuery<Album> query = jpaQueryFactory
+			.select(album)
+			.from(album)
+			.leftJoin(album.member, member)
+			.orderBy(orderSpecifier)
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize());
+
+		JPAQuery<Long> totalQuery = jpaQueryFactory
+			.select(album.count())
+			.from(album)
+			.leftJoin(album.member, member);
+		return PageableExecutionUtils.getPage(query.fetch(), pageable, totalQuery::fetchOne);
 	}
 }

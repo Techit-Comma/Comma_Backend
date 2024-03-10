@@ -1,7 +1,5 @@
 package com.bitharmony.comma.album.album.entity;
 
-import static jakarta.persistence.CascadeType.*;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,7 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -70,9 +67,8 @@ public class Album {
 
 	private long albumLikesCount;
 
-	@OneToMany(mappedBy = "album", cascade = ALL, orphanRemoval = true)
-	@Builder.Default
-	private Set<StreamingCount> streamingCounts = new HashSet<>();
+	@ManyToMany
+	private Set<Member> streamingCounts = new HashSet<>();
 
 	public void update(AlbumEditRequest request) {
 		this.albumname = request.albumname();
