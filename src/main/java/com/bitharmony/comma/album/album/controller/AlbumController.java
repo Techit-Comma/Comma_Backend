@@ -1,5 +1,6 @@
 package com.bitharmony.comma.album.album.controller;
 
+import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import java.security.Principal;
 
 import org.springframework.data.domain.Page;
@@ -37,6 +38,7 @@ public class AlbumController {
 
 	private final AlbumService albumService;
 	private final AlbumLikeService albumLikeService;
+	private final AlbumConvertUtil albumConvertUtil;
 	private final MemberService memberService;
 
 	@PostMapping("/release")
@@ -50,14 +52,14 @@ public class AlbumController {
 		}
 
 		Album album = albumService.release(request, member);
-		return GlobalResponse.of("200", albumToResponseDto(album));
+		return GlobalResponse.of("200", albumConvertUtil.albumToResponseDto(album));
 	}
 
 	@GetMapping("/detail/{id}")
 	public GlobalResponse getAlbum(@PathVariable long id) {
 		Album album = albumService.getAlbumById(id);
 
-		return GlobalResponse.of("200", albumToResponseDto(album));
+		return GlobalResponse.of("200", albumConvertUtil.albumToResponseDto(album));
 	}
 
 	@GetMapping("/{username}")
@@ -89,7 +91,7 @@ public class AlbumController {
 		}
 
 		Album editedAlbum = albumService.edit(request, album);
-		return GlobalResponse.of("200", albumToResponseDto(editedAlbum));
+		return GlobalResponse.of("200", albumConvertUtil.albumToResponseDto(editedAlbum));
 	}
 
 	@DeleteMapping("/{id}")
@@ -160,22 +162,7 @@ public class AlbumController {
 	@PreAuthorize("isAuthenticated()")
 		public GlobalResponse getMyAlbum(Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
-		return GlobalResponse.of("200", member.getAlbumList().stream().map(this::albumToResponseDto).toList());
+		return GlobalResponse.of("200", member.getAlbumList().stream().map(albumConvertUtil::albumToResponseDto).toList());
 	}
 
-	public AlbumResponse albumToResponseDto(Album album) {
-		return AlbumResponse.builder()
-			.id(album.getId())
-			.albumname(album.getAlbumname())
-			.genre(album.getGenre())
-			.license(album.isLicense())
-			.licenseDescription(album.getLicenseDescription())
-			.imgPath(album.getImagePath())
-			.filePath(album.getFilePath())
-			.permit(album.isPermit())
-			.price(album.getPrice())
-			.artistNickname(album.getMember().getNickname())
-			.artistUsername(album.getMember().getUsername())
-			.build();
-	}
 }

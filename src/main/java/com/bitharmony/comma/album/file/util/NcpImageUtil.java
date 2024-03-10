@@ -38,4 +38,21 @@ public class NcpImageUtil {
 			.withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
 			.build();
 	}
+
+	public String getAlbumImageUrl(String filepath) {
+		if (filepath == null) {
+			return null;
+		}
+
+		return imageCdn + replaceBucketName(filepath, bucketName, "")
+				+ imageCdnQueryString;
+	}
+
+	public String getAlbumFileUrl(String filepath) { // 미사용 메서드이긴 하나, 향후 추가 리팩토링 시 사용여부 결정
+		return endPoint + "/" + replaceBucketName(filepath, bucketName, "");
+	}
+
+	private String replaceBucketName(String filepath, String bucketName, String replacement) {
+		return filepath.replace(bucketName, replacement);
+	}
 }
