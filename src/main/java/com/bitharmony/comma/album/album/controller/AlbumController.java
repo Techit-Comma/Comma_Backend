@@ -1,13 +1,9 @@
 package com.bitharmony.comma.album.album.controller;
 
+import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
-import com.bitharmony.comma.album.album.dto.AlbumFindRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
@@ -43,6 +38,7 @@ public class AlbumController {
 
 	private final AlbumService albumService;
 	private final AlbumLikeService albumLikeService;
+	private final AlbumConvertUtil albumConvertUtil;
 	private final MemberService memberService;
 
 	@PostMapping("/release")
@@ -56,14 +52,14 @@ public class AlbumController {
 		}
 
 		Album album = albumService.release(request, member);
-		return GlobalResponse.of("200", albumToResponseDto(album));
+		return GlobalResponse.of("200", albumConvertUtil.albumToResponseDto(album));
 	}
 
 	@GetMapping("/detail/{id}")
 	public GlobalResponse getAlbum(@PathVariable long id) {
 		Album album = albumService.getAlbumById(id);
 
-		return GlobalResponse.of("200", albumToResponseDto(album));
+		return GlobalResponse.of("200", albumConvertUtil.albumToResponseDto(album));
 	}
 
 	@GetMapping("/{username}")
@@ -95,7 +91,7 @@ public class AlbumController {
 		}
 
 		Album editedAlbum = albumService.edit(request, album);
-		return GlobalResponse.of("200", albumToResponseDto(editedAlbum));
+		return GlobalResponse.of("200", albumConvertUtil.albumToResponseDto(editedAlbum));
 	}
 
 	@DeleteMapping("/{id}")
@@ -134,16 +130,6 @@ public class AlbumController {
 		return GlobalResponse.of("200");
 	}
 
-	@PostMapping("/{albumId}/streaming")
-	@PreAuthorize("isAuthenticated()")
-	public GlobalResponse streaming(@PathVariable long albumId, Principal principal) {
-		Member member = memberService.getMemberByUsername(principal.getName());
-		Album album = albumService.getAlbumById(albumId);
-
-		albumService.streamingMember(member, album);
-		return GlobalResponse.of("200");
-	}
-
 	@PostMapping("/{albumId}/cancelLike")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalResponse cancelLike(@PathVariable long albumId, Principal principal) {
@@ -176,52 +162,7 @@ public class AlbumController {
 	@PreAuthorize("isAuthenticated()")
 		public GlobalResponse getMyAlbum(Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
-		return GlobalResponse.of("200", member.getAlbumList().stream().map(this::albumToResponseDto).toList());
+		return GlobalResponse.of("200", member.getAlbumList().stream().map(albumConvertUtil::albumToResponseDto).toList());
 	}
 
-	@GetMapping("/streamingTop10Albums")
-	public GlobalResponse getTop10Albums() {
-		List<Sort.Order> sorts = new ArrayList<>();
-		sorts.add(Sort.Order.desc("id"));
-		Pageable pageable = PageRequest.of(0, 10, Sort.by(sorts));
-
-		Page<Album> itemsPage = albumService.streamingTop10Albums(pageable);
-		return GlobalResponse.of("200", itemsPage.map(this::albumToResponseDto));
-	}
-
-	@GetMapping("/recommendAlbum")
-	public GlobalResponse getRecommendAlbum(Principal principal) {
-		List<Sort.Order> sorts = new ArrayList<>();
-		sorts.add(Sort.Order.desc("id"));
-		Pageable pageable = PageRequest.of(0, 10, Sort.by(sorts));
-
-		Page<Album> itemsPage = albumService.musicRecommendation10Albums(principal, pageable);
-		return GlobalResponse.of("200", itemsPage.map(this::albumToResponseDto));
-	}
-
-	@GetMapping("/searchAlbum")
-	public GlobalResponse searchAlbum(@Valid AlbumFindRequest request) {
-		List<Sort.Order> sorts = new ArrayList<>();
-		sorts.add(Sort.Order.desc("id"));
-		Pageable pageable = PageRequest.of(request.page() - 1, 10, Sort.by(sorts));
-
-		Page<Album> itemsPage = albumService.search(request, pageable);
-		return GlobalResponse.of("200", itemsPage.map(this::albumToResponseDto));
-	}
-
-	public AlbumResponse albumToResponseDto(Album album) {
-		return AlbumResponse.builder()
-			.id(album.getId())
-			.albumname(album.getAlbumname())
-			.genre(album.getGenre())
-			.license(album.isLicense())
-			.licenseDescription(album.getLicenseDescription())
-			.imgPath(album.getImagePath())
-			.filePath(album.getFilePath())
-			.permit(album.isPermit())
-			.price(album.getPrice())
-			.artistNickname(album.getMember().getNickname())
-			.artistUsername(album.getMember().getUsername())
-			.build();
-	}
 }

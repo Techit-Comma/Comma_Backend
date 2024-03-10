@@ -1,5 +1,6 @@
 package com.bitharmony.comma.member.entity;
 
+import com.bitharmony.comma.playlist.entity.Playlist;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,11 +59,16 @@ public class Member {
     @OneToMany(mappedBy = "follower")
     private List<Follow> followingList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "producer")
+    private List<Playlist> playlists = new ArrayList<>();
+
+    @OneToMany
+    private List<Album> albumList = new ArrayList<>();
+
     @Builder.Default
     private String provider = "COMMA";
 
     private String providerId;
 
-    @OneToMany
-    private List<Album> albumList = new ArrayList<>();
+
 }
