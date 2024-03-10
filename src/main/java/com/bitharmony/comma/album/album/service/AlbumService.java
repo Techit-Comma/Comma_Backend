@@ -1,6 +1,5 @@
 package com.bitharmony.comma.album.album.service;
 
-import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -18,10 +17,10 @@ import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
+import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
 import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.member.service.MemberService;
 import com.bitharmony.comma.streaming.util.NcpMusicUtil;
 
 import jakarta.validation.Valid;
@@ -132,7 +131,7 @@ public class AlbumService {
 	}
 
 	public Page<Album> musicRecommendation10Albums(Principal principal, Pageable pageable) {
-		return albumRepository.musicRecommendation10Albums(principal.getName(), pageable);
+		return albumRepository.musicRecommendation10Albums(principal, pageable);
 	}
 
 	public Page<Album> streamingTop10Albums(Pageable pageable) {
