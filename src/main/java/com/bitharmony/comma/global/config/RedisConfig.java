@@ -1,6 +1,9 @@
 package com.bitharmony.comma.global.config;
 
+import com.bitharmony.comma.global.util.Channel;
 import com.bitharmony.comma.notification.util.ArtistNotificationListener;
+import com.bitharmony.comma.streaming.util.EncodingStatusListener;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,12 +16,16 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
     @Value("${secret.data.redis.port}")
     private int port;
 
     @Value("${secret.data.redis.host}")
     private String host;
+
+    private final EncodingStatusListener encodingStatusListener;
+    private final ArtistNotificationListener artistNotificationListener;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -42,17 +49,29 @@ public class RedisConfig {
     public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(encodeStatusListenerAdapter(), topicStatus());
+        container.addMessageListener(notificationListenerAdapter(), topicNotification());
         return container;
     }
 
     @Bean
+    MessageListenerAdapter encodeStatusListenerAdapter() {
+        return new MessageListenerAdapter(encodingStatusListener);
+    }
+
+    @Bean
+    MessageListenerAdapter notificationListenerAdapter() {
+        return new MessageListenerAdapter(artistNotificationListener);
+    }
+
+    @Bean
     public ChannelTopic topicStatus() {
-        return new ChannelTopic("encodingStatus");
+        return new ChannelTopic(Channel.ENCODING_STATUS.getName());
     }
 
     @Bean
     public ChannelTopic topicNotification() {
-        return new ChannelTopic("artistNotification");
+        return new ChannelTopic(Channel.ARTIST_NOTIFICATION.getName());
     }
 
 }
