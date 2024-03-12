@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

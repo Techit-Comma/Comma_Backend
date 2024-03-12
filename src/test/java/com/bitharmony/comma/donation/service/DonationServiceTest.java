@@ -1,10 +1,12 @@
 package com.bitharmony.comma.donation.service;
 
-import com.bitharmony.comma.donation.dto.DonationOnceRequestDto;
-import com.bitharmony.comma.donation.entity.DonationRegular;
-import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.member.repository.MemberRepository;
-import com.bitharmony.comma.member.service.MemberService;
+import com.bitharmony.comma.donation.donation.dto.DonationOnceRequestDto;
+import com.bitharmony.comma.donation.donation.entity.DonationRegular;
+import com.bitharmony.comma.donation.donation.service.DonationRegularService;
+import com.bitharmony.comma.donation.donation.service.DonationService;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.member.member.repository.MemberRepository;
+import com.bitharmony.comma.member.member.service.MemberService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.quartz.SchedulerException;

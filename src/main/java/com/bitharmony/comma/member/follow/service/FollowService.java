@@ -1,13 +1,13 @@
 package com.bitharmony.comma.member.follow.service;
 
-import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.member.follow.exception.DuplicateFollowException;
-import com.bitharmony.comma.member.follow.exception.FollowNotFoundException;
-import com.bitharmony.comma.member.follow.exception.SelfFollowException;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.global.exception.member.DuplicateFollowException;
+import com.bitharmony.comma.global.exception.member.FollowNotFoundException;
+import com.bitharmony.comma.global.exception.member.SelfFollowException;
 import com.bitharmony.comma.member.follow.dto.FollowingListResponse;
 import com.bitharmony.comma.member.follow.entity.Follow;
 import com.bitharmony.comma.member.follow.repository.FollowRepository;
-import com.bitharmony.comma.member.service.MemberService;
+import com.bitharmony.comma.member.member.service.MemberService;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

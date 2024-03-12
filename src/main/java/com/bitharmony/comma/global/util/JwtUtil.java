@@ -1,6 +1,6 @@
 package com.bitharmony.comma.global.util;
 
-import com.bitharmony.comma.global.exception.ExpiredAccessTokenException;
+import com.bitharmony.comma.global.exception.member.ExpiredAccessTokenException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.bitharmony.comma.member.dto.JwtCreateRequest;
+import com.bitharmony.comma.member.member.dto.JwtCreateRequest;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

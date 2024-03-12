@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 
 import lombok.RequiredArgsConstructor;
 

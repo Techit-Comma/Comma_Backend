@@ -10,8 +10,7 @@ import com.bitharmony.comma.community.artitcle.repository.ArticleImageRepository
 import com.bitharmony.comma.community.artitcle.util.NcpArticleImageUtil;
 import com.bitharmony.comma.global.exception.community.DeleteArticleImageFailureException;
 import com.bitharmony.comma.global.exception.community.ImageNotFoundException;
-import com.bitharmony.comma.member.exception.DeleteOldProfileFailureException;
-import com.bitharmony.comma.member.exception.UploadFailureException;
+import com.bitharmony.comma.global.exception.member.UploadFailureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

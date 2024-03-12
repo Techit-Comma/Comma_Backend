@@ -1,8 +1,8 @@
 package com.bitharmony.comma.global.config;
 
 import com.bitharmony.comma.global.util.Channel;
-import com.bitharmony.comma.notification.util.ArtistNotificationListener;
-import com.bitharmony.comma.streaming.util.EncodingStatusListener;
+import com.bitharmony.comma.member.notification.util.ArtistNotificationListener;
+import com.bitharmony.comma.album.streaming.util.EncodingStatusListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

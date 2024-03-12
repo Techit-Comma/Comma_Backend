@@ -4,7 +4,7 @@ import com.bitharmony.comma.community.artitcle.service.ArticleService;
 import com.bitharmony.comma.community.comment.entity.Comment;
 import com.bitharmony.comma.community.comment.repository.CommentRepository;
 import com.bitharmony.comma.global.exception.community.CommentNotFoundException;
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
