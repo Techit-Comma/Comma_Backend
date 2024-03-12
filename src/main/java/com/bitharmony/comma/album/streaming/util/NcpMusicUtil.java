@@ -2,13 +2,8 @@ package com.bitharmony.comma.album.streaming.util;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.SdkClientException;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.bitharmony.comma.global.config.NcpConfig;
 import com.bitharmony.comma.global.exception.streaming.MusicFileNotFoundException;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -16,31 +11,21 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
+@RequiredArgsConstructor
 public class NcpMusicUtil {
+
     private final AmazonS3 amazonS3;
 
-    public final String bucketName;
-    public final String path;
+    @Value("${ncp.s3.music-bucket}")
+    public String bucketName;
 
-    public NcpMusicUtil(NcpConfig ncpConfig) {
-        bucketName = ncpConfig.getS3().getMusicBucket();
-        path = ncpConfig.getS3().getMusicPath();
-
-        String accessKey = ncpConfig.getMusicCredentials().getAccessKey();
-        String secretKey = ncpConfig.getMusicCredentials().getSecretKey();
-        String endPoint = ncpConfig.getS3().getEndPoint();
-        String region = ncpConfig.getS3().getRegion();
-
-        amazonS3 = AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, region))
-                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
-                .build();
-    }
+    @Value("${ncp.s3.music-path}")
+    public String path;
 
     public URL generatePresignedUrl(String filePath) {
         LocalDateTime expiration = LocalDateTime.now().plusMinutes(15);

@@ -7,33 +7,22 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.bitharmony.comma.global.config.NcpConfig;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Getter
 @Component
+@RequiredArgsConstructor
 public class NcpProfileImageUtil {
     private final AmazonS3 amazonS3;
-    private final String bucketName;
-    private final String endPoint;
-    private final String imageCdn;
-    private final String memberCdn;
-    private final String imageCdnQueryString;
 
-    public NcpProfileImageUtil(NcpConfig ncpConfig) {
-        bucketName = ncpConfig.getS3().getProfileImageBucket();
-        endPoint = ncpConfig.getS3().getEndPoint();
-        imageCdn = ncpConfig.getImageOptimizer().getAlbumCdn();
-        memberCdn = ncpConfig.getImageOptimizer().getMemberCdn();
-        imageCdnQueryString = ncpConfig.getImageOptimizer().getQueryString();
+    @Value("${ncp.s3.profile-image-bucket}")
+    public String bucketName;
 
-        String accessKey = ncpConfig.getImageCredentials().getAccessKey();
-        String secretKey = ncpConfig.getImageCredentials().getSecretKey();
-        String endPoint = ncpConfig.getS3().getEndPoint();
-        String region = ncpConfig.getS3().getRegion();
+    @Value("${ncp.image-optimizer.member-cdn}")
+    public String memberCdn;
 
-        amazonS3 = AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, region))
-                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
-                .build();
-    }
+    @Value("${ncp.image-optimizer.query-string}")
+    public String imageCdnQueryString;
 }

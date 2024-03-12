@@ -49,7 +49,7 @@ public class AlbumService {
 		album.update(request);
 
 		if (album.getFilePath() != null)
-			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()), ncpImageUtil.getBucketName());
+			fileService.deleteFile(ncpImageUtil.getAlbumFileUrl(album.getImagePath()), ncpImageUtil.getBucketName());
 
 		saveAlbum(album);
 		return album;

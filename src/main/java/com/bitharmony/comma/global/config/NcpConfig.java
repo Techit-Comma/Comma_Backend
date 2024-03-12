@@ -1,55 +1,38 @@
 package com.bitharmony.comma.global.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 
 @Getter
-@RequiredArgsConstructor
-@ConfigurationProperties(prefix = "ncp")
+@Configuration
 public class NcpConfig {
 
-	private final ImageCredentials imageCredentials;
-	private final MusicCredentials musicCredentials;
-	private final S3 s3;
-	private final ImageOptimizer imageOptimizer;
+	@Value("${ncp.region}")
+	public String region;
 
-	@Getter
-	@RequiredArgsConstructor
-	public static class ImageCredentials {
-		private final String accessKey;
-		private final String secretKey;
+	@Value("${ncp.endpoint}")
+	public String endPoint;
+
+	@Value("${ncp.access-key}")
+	private String accessKey;
+
+	@Value("${ncp.secret-key}")
+	private String secretKey;
+
+	@Bean
+	public AmazonS3 amazonS3() {
+		return AmazonS3ClientBuilder.standard()
+				.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, region))
+				.withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
+				.build();
 	}
-
-	@Getter
-	@RequiredArgsConstructor
-	public static class MusicCredentials {
-		private final String accessKey;
-		private final String secretKey;
-	}
-
-	@Getter
-	@RequiredArgsConstructor
-	public static class S3 {
-		private final String region;
-		private final String endPoint;
-		private final String stack;
-		private final String imageBucket;
-		private final String profileImageBucket;
-		private final String articleImageBucket;
-		private final String musicBucket;
-		private final String musicPath;
-	}
-
-	@Getter
-	@RequiredArgsConstructor
-	public static class ImageOptimizer {
-		private final String albumCdn;
-		private final String memberCdn;
-		private final String articleCdn;
-		private final String queryString;
-	}
-
 }

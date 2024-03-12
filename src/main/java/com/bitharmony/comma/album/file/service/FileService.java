@@ -97,10 +97,6 @@ public class FileService {
 		return Optional.empty();
 	}
 
-	public String getAlbumFileUrl(String filepath) {
-		return ncpImageUtil.getEndPoint() + "/" + filepath;
-	}
-
 	public String getFileName(String filepath, String bucketName) {
 		String replacedFilePath = filepath.replace(bucketName, "");
 		return replacedFilePath.substring(replacedFilePath.lastIndexOf("/") + 1);

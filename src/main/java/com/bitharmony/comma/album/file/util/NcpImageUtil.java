@@ -1,5 +1,7 @@
 package com.bitharmony.comma.album.file.util;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -13,31 +15,19 @@ import lombok.Getter;
 
 @Getter
 @Component
+@RequiredArgsConstructor
 public class NcpImageUtil {
 	private final AmazonS3 amazonS3;
-	private final String bucketName;
-	private final String endPoint;
-	private final String imageCdn;
-	private final String memberCdn;
-	private final String imageCdnQueryString;
+	private final NcpConfig ncpConfig;
 
-	public NcpImageUtil(NcpConfig ncpConfig) {
-		bucketName = ncpConfig.getS3().getImageBucket();
-		endPoint = ncpConfig.getS3().getEndPoint();
-		imageCdn = ncpConfig.getImageOptimizer().getAlbumCdn();
-		memberCdn = ncpConfig.getImageOptimizer().getMemberCdn();
-		imageCdnQueryString = ncpConfig.getImageOptimizer().getQueryString();
-
-		String accessKey = ncpConfig.getImageCredentials().getAccessKey();
-		String secretKey = ncpConfig.getImageCredentials().getSecretKey();
-		String endPoint = ncpConfig.getS3().getEndPoint();
-		String region = ncpConfig.getS3().getRegion();
-
-		amazonS3 = AmazonS3ClientBuilder.standard()
-			.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, region))
-			.withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
-			.build();
-	}
+	@Value("${ncp.s3.image-bucket}")
+	private String bucketName;
+	@Value("${ncp.image-optimizer.album-cdn}")
+	private String imageCdn;
+	@Value("${ncp.image-optimizer.member-cdn}")
+	private String memberCdn;
+	@Value("${ncp.image-optimizer.query-string}")
+	private String imageCdnQueryString;
 
 	public String getAlbumImageUrl(String filepath) {
 		if (filepath == null) {
@@ -48,8 +38,8 @@ public class NcpImageUtil {
 				+ imageCdnQueryString;
 	}
 
-	public String getAlbumFileUrl(String filepath) { // 미사용 메서드이긴 하나, 향후 추가 리팩토링 시 사용여부 결정
-		return endPoint + "/" + replaceBucketName(filepath, bucketName);
+	public String getAlbumFileUrl(String filepath) {
+		return ncpConfig.endPoint + "/" + filepath;
 	}
 
 	private String replaceBucketName(String filepath, String bucketName) {
