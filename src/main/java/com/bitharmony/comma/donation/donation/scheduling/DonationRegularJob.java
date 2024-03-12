@@ -6,6 +6,7 @@ import com.bitharmony.comma.donation.donation.repository.DonationRepository;
 import com.bitharmony.comma.global.exception.donation.CreditShortageException;
 import com.bitharmony.comma.member.member.entity.Member;
 import com.bitharmony.comma.member.member.service.MemberService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +14,13 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @DisallowConcurrentExecution // 중복 실행 방지
 @PersistJobDataAfterExecution
 public class DonationRegularJob implements Job {
 
-    @Autowired
-    private DonationRepository donationRepository;
-    @Autowired
-    private MemberService memberService;
-
+    private final DonationRepository donationRepository;
+    private final MemberService memberService;
 
     @Override
     public void execute(JobExecutionContext context) {

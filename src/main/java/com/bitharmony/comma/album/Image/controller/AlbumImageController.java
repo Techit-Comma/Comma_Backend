@@ -32,7 +32,7 @@ public class AlbumImageController {
 	}
 
 	@GetMapping("/status")
-	public GlobalResponse encodeStatus(@RequestParam(value = "filePath", required = true) String filePath) {
+	public GlobalResponse encodeStatus(@RequestParam(value = "filePath") String filePath) {
 		return GlobalResponse.of("200", fileService.isFileUploadedToS3(filePath));
 	}
 }

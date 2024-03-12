@@ -73,7 +73,7 @@ public class CommentController {
         Member member = memberService.getMemberByUsername(principal.getName());
         Comment comment = commentService.getCommentById(commentId);
 
-        if(!commentService.canDeleteOrModify(member, comment)) {
+        if(commentService.canNotDeleteOrModify(member, comment)) {
             throw new NotAuthorizedException();
         }
 
@@ -94,7 +94,7 @@ public class CommentController {
         Member member = memberService.getMemberByUsername(principal.getName());
         Comment comment = commentService.getCommentById(commentId);
 
-        if(!commentService.canDeleteOrModify(member, comment)) {
+        if(commentService.canNotDeleteOrModify(member, comment)) {
             throw new NotAuthorizedException();
         }
 

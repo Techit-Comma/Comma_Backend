@@ -26,8 +26,6 @@ public class AlbumImageService {
 
 	public boolean checkImageFile(MultipartFile musicImageFile) {
 		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
-		if (imgFile.isEmpty() || musicImageFile == null) return false;
-
-		return true;
-	}
+        return imgFile.isPresent() && musicImageFile != null;
+    }
 }

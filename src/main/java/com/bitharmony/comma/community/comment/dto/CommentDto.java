@@ -1,6 +1,5 @@
 package com.bitharmony.comma.community.comment.dto;
 
-import com.bitharmony.comma.community.artitcle.entity.Article;
 import com.bitharmony.comma.community.comment.entity.Comment;
 import lombok.Builder;
 

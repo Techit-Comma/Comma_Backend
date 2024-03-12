@@ -40,8 +40,8 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    public boolean canDeleteOrModify(Member member, Comment comment) {
-        return comment.getCommenter().getUsername().equals(member.getUsername());
+    public boolean canNotDeleteOrModify(Member member, Comment comment) {
+        return !comment.getCommenter().getUsername().equals(member.getUsername());
     }
 
     public Comment modifyComment(Comment comment, String content) {

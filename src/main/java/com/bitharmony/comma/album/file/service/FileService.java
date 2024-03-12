@@ -57,7 +57,7 @@ public class FileService {
 	public FileResponse uploadFile(MultipartFile multipartFile, String bucketName) {
 		String originalFileName = multipartFile.getOriginalFilename();
 		String uploadFileName = getUuidFileName(originalFileName);
-		String uploadFileUrl = "";
+		String uploadFileUrl;
 
 		ObjectMetadata objectMetadata = new ObjectMetadata();
 		objectMetadata.setContentLength(multipartFile.getSize());

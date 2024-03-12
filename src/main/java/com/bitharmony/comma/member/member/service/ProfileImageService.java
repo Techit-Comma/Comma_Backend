@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProfileImageService {
     private final NcpProfileImageUtil ncpProfileImageUtil;
-    public String defaultProfileUrl = "https://kv6d2rdb2209.edge.naverncp.com/F82rLGPicA/default_profile.jpg?type=f&w=300&h=300&ttype=jpg";
+    public final static String defaultProfileUrl = "https://kv6d2rdb2209.edge.naverncp.com/F82rLGPicA/default_profile.jpg?type=f&w=300&h=300&ttype=jpg";
 
     public String getUuidFileName(String fileName) {
         String ext = fileName.substring(fileName.indexOf(".") + 1);
@@ -30,7 +30,7 @@ public class ProfileImageService {
     public MemberImageResponse uploadFile(MultipartFile multipartFile) {
         String originalFileName = multipartFile.getOriginalFilename();
         String uploadFileName = getUuidFileName(originalFileName);
-        String imageUrl = "";
+        String imageUrl;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(multipartFile.getSize());

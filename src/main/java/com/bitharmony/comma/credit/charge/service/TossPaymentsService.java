@@ -54,7 +54,8 @@ public class TossPaymentsService {
 
     private void setRequestHeaders(HttpURLConnection connection) throws Exception {
         Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((tossPaymentsWidgetSecretKey + ":").getBytes("UTF-8"));
+        byte[] encodedBytes = encoder.encode((tossPaymentsWidgetSecretKey + ":").getBytes(
+                StandardCharsets.UTF_8));
         String authorizations = "Basic " + new String(encodedBytes, 0, encodedBytes.length);
 
         connection.setRequestProperty("Authorization", authorizations);
@@ -63,7 +64,7 @@ public class TossPaymentsService {
 
     private void sendPaymentInfo(HttpURLConnection connection, JSONObject paymentInfo) throws IOException {
         try (OutputStream outputStream = connection.getOutputStream()) {
-            outputStream.write(paymentInfo.toString().getBytes("UTF-8"));
+            outputStream.write(paymentInfo.toString().getBytes(StandardCharsets.UTF_8));
         }
     }
 

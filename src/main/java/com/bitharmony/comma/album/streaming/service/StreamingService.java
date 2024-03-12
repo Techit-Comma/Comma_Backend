@@ -32,22 +32,14 @@ public class StreamingService {
 
     public void encodeStatus(String filePath, String outputType, EncodeStatus status) {
         switch (status) {
-            case WAITING -> {
-                sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.WAITING);
-            }
-            case RUNNING -> {
-                sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.RUNNING);
-            }
-            case COMPLETE -> {
-                sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.COMPLETE);
-            }
+            case WAITING -> sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.WAITING);
+            case RUNNING -> sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.RUNNING);
+            case COMPLETE -> sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.COMPLETE);
             case FAILURE -> {
                 sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.FAILURE);
                 throw new EncodingFailureException();
             }
-            case CANCELED -> {
-                sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.CANCELED);
-            }
+            case CANCELED -> sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.CANCELED);
         }
     }
 

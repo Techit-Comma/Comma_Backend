@@ -32,7 +32,7 @@ public class ArticleImageService {
 
     public String uploadFile(MultipartFile multipartFile) {
         String uploadFileName = getUuidFileName(multipartFile.getOriginalFilename());
-        String imageUrl = "";
+        String imageUrl;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(multipartFile.getSize());

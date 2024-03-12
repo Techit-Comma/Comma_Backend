@@ -29,16 +29,12 @@ public class AlbumLikeService {
 	public Boolean canLike(Member member, Album album) {
 		if (member == null) return false;
 		if (album == null) return false;
-		if (album.getAlbumLikes().contains(member)) return false;
-
-		return true;
-	}
+        return !album.getAlbumLikes().contains(member);
+    }
 
 	public Boolean canCancelLike(Member member, Album album) {
 		if (member == null) return false;
 		if (album == null) return false;
-		if (!album.getAlbumLikes().contains(member)) return false;
-
-		return true;
-	}
+        return album.getAlbumLikes().contains(member);
+    }
 }

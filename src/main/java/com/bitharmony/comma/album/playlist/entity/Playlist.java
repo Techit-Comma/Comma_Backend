@@ -22,14 +22,14 @@ public class Playlist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "playlist_id")
+    @Column
     private Long id;
 
     @Column(nullable = false)
     private String title;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(nullable = false)
     private Member producer;
 
 }

@@ -20,7 +20,7 @@ public class Donation {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "MEMBER_ID")
+    @JoinColumn
     @NotNull
     private Member patron;
 

@@ -30,11 +30,11 @@ import lombok.NoArgsConstructor;
 public class Album {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "album_id")
+	@Column
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id")
+	@JoinColumn
 	@NotNull
 	private Member member;
 

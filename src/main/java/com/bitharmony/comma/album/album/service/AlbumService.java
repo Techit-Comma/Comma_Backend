@@ -87,39 +87,29 @@ public class AlbumService {
 	public boolean canRelease(String name, Member member) {
 		if (member == null)
 			return false;
-		if (albumRepository.findByAlbumname(name).isPresent())
-			return false;
-
-		return true;
-	}
+        return albumRepository.findByAlbumname(name).isEmpty();
+    }
 
 	public boolean canEdit(Album album, Principal principal, @Valid AlbumEditRequest request, Member member) {
 		if (member == null)
 			return false;
 		if (!album.getMember().getUsername().equals(principal.getName()))
 			return false;
-		if (albumRepository.findByAlbumname(request.albumname()).isPresent() && !album.getAlbumname().equals(request.albumname()))
-			return false;
-
-		return true;
-	}
+        return albumRepository.findByAlbumname(request.albumname()).isEmpty()
+                || album.getAlbumname().equals(request.albumname());
+    }
 
 	public boolean canDelete(Album album, Principal principal) {
-		if (!album.getMember().getUsername().equals(principal.getName()))
-			return false;
-		return true;
-	}
+        return album.getMember().getUsername().equals(principal.getName());
+    }
 
 	public boolean canBuy(Member member, Album album) {
 		if (member.getCredit() < album.getPrice())
 			return false;
 		if (album.getMember().getUsername().equals(member.getUsername()))
 			return false;
-		if (!album.isPermit())
-			return false;
-
-		return true;
-	}
+        return album.isPermit();
+    }
 
 	@Transactional
 	public void resetStreamingCounts() {

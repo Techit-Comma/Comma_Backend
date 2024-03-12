@@ -43,11 +43,6 @@ public class Withdraw {
 
 
     public boolean isHandled() {
-
-        if (withdrawCancelDate != null || withdrawDoneDate != null) {
-            return true;
-        }
-
-        return false;
+        return withdrawCancelDate != null || withdrawDoneDate != null;
     }
 }

@@ -39,7 +39,7 @@ public class CreditLogService {
 
     @Transactional
     public void addCreditLog(Member member, CreditLog.EventType eventType, long creditChangeAmount) {
-        CreditLog creditLog = new CreditLog().builder()
+        CreditLog creditLog = CreditLog.builder()
                 .member(member)
                 .eventType(eventType)
                 .creditChangeAmount(creditChangeAmount)

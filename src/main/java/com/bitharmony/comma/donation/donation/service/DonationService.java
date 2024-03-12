@@ -62,7 +62,7 @@ public class DonationService {
         List<Donation> donationList = donationRepository.findAllByArtistUsername(username);
         List<DonationFindResponseDto> responseDtoList = new ArrayList<>();
 
-        if (donationList.size() == 0) {
+        if (donationList.isEmpty()) {
             throw new DonationListNotFoundException();
         }
 
@@ -88,7 +88,7 @@ public class DonationService {
         List<Donation> donationList = donationRepository.findAllByPatron(patron);
         List<DonationFindResponseDto> responseDtoList = new ArrayList<>();
 
-        if (donationList.size() == 0) {
+        if (donationList.isEmpty()) {
             throw new DonationListNotFoundException();
         }
 

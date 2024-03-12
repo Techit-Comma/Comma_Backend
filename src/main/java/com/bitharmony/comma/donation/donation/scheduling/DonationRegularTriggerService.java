@@ -1,6 +1,7 @@
 package com.bitharmony.comma.donation.donation.scheduling;
 
 import com.bitharmony.comma.donation.donation.entity.DonationRegular;
+import com.bitharmony.comma.global.exception.donation.CronExpressionNullException;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.triggers.CronTriggerImpl;
@@ -19,7 +20,7 @@ public class DonationRegularTriggerService {
 
         CronExpression cronExpression = makeCronExpression(donationRegular.getExecuteDay());
         if (cronExpression == null) {
-            // null 처리
+            throw new CronExpressionNullException();
         }
         return newTrigger()
                 .forJob(jobKey)
@@ -30,7 +31,7 @@ public class DonationRegularTriggerService {
     }
 
     private CronExpression makeCronExpression(int day) {
-        CronExpression cronExpression = null;
+        CronExpression cronExpression;
         try {
             cronExpression = new CronExpression(String.format("0 0 10 %s * ?", day));
         } catch (ParseException e) {
@@ -46,7 +47,8 @@ public class DonationRegularTriggerService {
         TriggerKey triggerKey = new TriggerKey(jobKey.getName(), jobKey.getGroup());
 
         // cron trigger 형태로 불러오기?? 이게 가능?
-        CronTriggerImpl trigger = new CronTriggerImpl();
+        CronTriggerImpl trigger;
+
         try{
             trigger = (CronTriggerImpl) scheduler.getTrigger(triggerKey);
         } catch (SchedulerException e){

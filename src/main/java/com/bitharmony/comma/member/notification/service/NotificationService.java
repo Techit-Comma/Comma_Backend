@@ -58,10 +58,7 @@ public class NotificationService {
         SseEmitter emitter = sseEmitterUtil.createSseEmitter();
         String key = member.getId().toString();
 
-        emitter.onCompletion(() -> {
-            sseEmitterUtil.complete(emitter, key);
-        });
-
+        emitter.onCompletion(() -> sseEmitterUtil.complete(emitter, key));
         emitter.onTimeout(emitter::complete);
 
         sseEmitterRepository.save(key, emitter);

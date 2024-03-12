@@ -22,14 +22,14 @@ public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notification_id")
+    @Column
     private Long id;
 
     @Column(nullable = false)
     private String message;
 
     @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(nullable = false)
     private Member receiver;
 
     @Builder.Default

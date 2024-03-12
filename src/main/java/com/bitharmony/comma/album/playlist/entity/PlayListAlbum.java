@@ -24,10 +24,10 @@ public class PlayListAlbum {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "playlist_id")
+    @JoinColumn
     private Playlist playlist;
 
     @ManyToOne
-    @JoinColumn(name = "album_id")
+    @JoinColumn
     private Album album;
 }

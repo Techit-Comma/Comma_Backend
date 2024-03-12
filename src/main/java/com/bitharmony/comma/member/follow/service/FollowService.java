@@ -55,7 +55,7 @@ public class FollowService {
         Member follower = memberService.getMemberByUsername(username);
 
         Follow follow = followRepository.findByFollowerIdAndFollowingId(follower.getId(), following.getId())
-                .orElseThrow(() -> new FollowNotFoundException());
+                .orElseThrow(FollowNotFoundException::new);
 
         followRepository.delete(follow);
     }

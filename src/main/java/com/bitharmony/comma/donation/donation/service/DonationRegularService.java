@@ -32,7 +32,7 @@ public class DonationRegularService {
 
         List<DonationRegular> donationRegulars = donationRegularRepository.findAllByPatronName(patronName);
         List<DonationRegularFindResponseDto> dtoList = new ArrayList<>();
-        if (donationRegulars.size() == 0) {
+        if (donationRegulars.isEmpty()) {
             throw new DonationListNotFoundException();
         }
 

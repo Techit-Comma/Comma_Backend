@@ -37,7 +37,7 @@ public class AuthService {
 
         JwtCreateRequest jwtCreateRequest = JwtCreateRequest.builder()
                 .id(Long.parseLong(userData.get("id")))
-                .username((String) userData.get("username"))
+                .username(userData.get("username"))
                 .build();
 
         String newRefreshToken = jwtUtil.createRefreshToken(jwtCreateRequest);

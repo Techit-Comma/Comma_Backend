@@ -93,26 +93,20 @@ public class MemberService {
     }
 
     public Member getMemberByUsername(String username) {
-
-        Member findMember = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException());
-
-        return findMember;
+        return memberRepository.findByUsername(username)
+                .orElseThrow(MemberNotFoundException::new);
     }
 
     public MemberReturnResponse getProfile() {
-
         SecurityUser loginedMember = getUser();
         Member findMember = getMemberByUsername(loginedMember.getUsername());
 
-        MemberReturnResponse response = MemberReturnResponse.builder()
+        return MemberReturnResponse.builder()
                 .username(findMember.getUsername())
                 .Email(findMember.getEmail())
                 .nickname(findMember.getNickname())
                 .profileImageUrl(findMember.getImageUrl())
                 .build();
-
-        return response;
     }
 
     public MemberReturnResponse getProfile(String username) {
