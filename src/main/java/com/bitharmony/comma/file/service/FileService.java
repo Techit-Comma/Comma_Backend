@@ -1,5 +1,7 @@
-package com.bitharmony.comma.album.file.service;
+package com.bitharmony.comma.file.service;
 
+import com.bitharmony.comma.file.dto.FileResponse;
+import com.bitharmony.comma.file.util.FileType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -16,9 +18,7 @@ import com.amazonaws.services.s3.model.GetObjectMetadataRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.bitharmony.comma.global.exception.album.AlbumFileException;
-import com.bitharmony.comma.album.file.dto.FileResponse;
-import com.bitharmony.comma.album.file.util.FileType;
-import com.bitharmony.comma.album.file.util.NcpImageUtil;
+import com.bitharmony.comma.album.album.util.NcpImageUtil;
 
 import lombok.RequiredArgsConstructor;
 

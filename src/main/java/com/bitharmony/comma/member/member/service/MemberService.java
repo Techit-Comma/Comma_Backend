@@ -49,14 +49,12 @@ public class MemberService {
         String accessToken = jwtUtil.createAccessToken(jwtCreateRequest);
         String refreshToken = jwtUtil.createRefreshToken(jwtCreateRequest);
 
-        MemberLoginResponse response = MemberLoginResponse.builder()
+        return MemberLoginResponse.builder()
                 .memberId(member.getId())
                 .username(member.getUsername())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-
-        return response;
     }
 
     @Transactional

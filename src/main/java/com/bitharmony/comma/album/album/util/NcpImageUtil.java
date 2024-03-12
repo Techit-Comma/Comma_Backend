@@ -1,4 +1,4 @@
-package com.bitharmony.comma.album.file.util;
+package com.bitharmony.comma.album.album.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

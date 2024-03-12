@@ -18,8 +18,8 @@ import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.global.exception.album.AlbumNotFoundException;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
-import com.bitharmony.comma.album.file.service.FileService;
-import com.bitharmony.comma.album.file.util.NcpImageUtil;
+import com.bitharmony.comma.file.service.FileService;
+import com.bitharmony.comma.album.album.util.NcpImageUtil;
 import com.bitharmony.comma.member.member.entity.Member;
 import com.bitharmony.comma.album.streaming.util.NcpMusicUtil;
 

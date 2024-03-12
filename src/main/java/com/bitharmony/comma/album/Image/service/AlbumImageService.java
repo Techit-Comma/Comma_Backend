@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.bitharmony.comma.album.file.dto.FileResponse;
-import com.bitharmony.comma.album.file.service.FileService;
-import com.bitharmony.comma.album.file.util.FileType;
-import com.bitharmony.comma.album.file.util.NcpImageUtil;
+import com.bitharmony.comma.file.dto.FileResponse;
+import com.bitharmony.comma.file.service.FileService;
+import com.bitharmony.comma.file.util.FileType;
+import com.bitharmony.comma.album.album.util.NcpImageUtil;
 
 import lombok.RequiredArgsConstructor;
 

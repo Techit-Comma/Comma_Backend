@@ -42,11 +42,9 @@ public class AuthService {
 
         String newRefreshToken = jwtUtil.createRefreshToken(jwtCreateRequest);
 
-        MemberLoginResponse response = MemberLoginResponse.builder()
+        return MemberLoginResponse.builder()
                 .accessToken(jwtUtil.createAccessToken(jwtCreateRequest))
                 .refreshToken(newRefreshToken)
                 .build();
-
-        return response;
     }
 }
