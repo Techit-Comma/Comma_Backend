@@ -1,6 +1,6 @@
 package com.bitharmony.comma.streaming.util;
 
-import com.bitharmony.comma.streaming.service.SseProvider;
+import com.bitharmony.comma.streaming.service.EncodingSseProvider;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.Message;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EncodingStatusListener implements MessageListener {
 
-    private final SseProvider sseProvider;
+    private final EncodingSseProvider encodingSseProvider;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
@@ -21,6 +21,6 @@ public class EncodingStatusListener implements MessageListener {
         String encodeType = parts[1];
         EncodeStatus status = EncodeStatus.valueOf(parts[2]);
 
-        sseProvider.sendEvent(key, encodeType, status);
+        encodingSseProvider.sendEvent(key, encodeType, status);
     }
 }
