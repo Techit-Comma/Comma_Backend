@@ -1,6 +1,5 @@
 package com.bitharmony.comma.album.album.service;
 
-import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -13,21 +12,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
+import com.bitharmony.comma.album.album.dto.AlbumFindRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
+import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
 import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.member.service.MemberService;
 import com.bitharmony.comma.streaming.util.NcpMusicUtil;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AlbumService {
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
@@ -78,6 +80,10 @@ public class AlbumService {
 		return albums.map(albumConvertUtil::convertToDto);
 	}
 
+	public Page<Album> search(AlbumFindRequest request, Pageable pageable) {
+		return albumRepository.search(request.kwTypes(), request.kw(), pageable);
+	}
+
 	public boolean canRelease(String name, Member member) {
 		if (member == null)
 			return false;
@@ -113,5 +119,29 @@ public class AlbumService {
 			return false;
 
 		return true;
+	}
+
+	@Transactional
+	public void resetStreamingCounts() {
+		log.info("Resetting streaming counts");
+		albumRepository.findAll().forEach(album -> {
+			album.getStreamingCounts().clear();
+			albumRepository.save(album);
+		});
+	}
+
+	public Page<Album> musicRecommendation10Albums(Principal principal, Pageable pageable) {
+		return albumRepository.musicRecommendation10Albums(principal, pageable);
+	}
+
+	public Page<Album> streamingTop10Albums(Pageable pageable) {
+		return albumRepository.streamingTop10Albums(pageable);
+	}
+
+	public void streamingMember(Member member, Album album) {
+		if(!album.getStreamingCounts().contains(member)) {
+			album.getStreamingCounts().add(member);
+			albumRepository.save(album);
+		}
 	}
 }
