@@ -11,10 +11,12 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Getter
 @Component
 @RequiredArgsConstructor
 public class NcpMusicUtil {
@@ -22,10 +24,10 @@ public class NcpMusicUtil {
     private final AmazonS3 amazonS3;
 
     @Value("${ncp.s3.music-bucket}")
-    public String bucketName;
+    private String bucketName;
 
     @Value("${ncp.s3.music-path}")
-    public String path;
+    private String path;
 
     public URL generatePresignedUrl(String filePath) {
         LocalDateTime expiration = LocalDateTime.now().plusMinutes(15);

@@ -143,7 +143,7 @@ public class ArticleController {
         List<String> imageUrls = new ArrayList<>();
         Article article = articleService.getArticleById(articleId);
         for(MultipartFile file: files) {
-            String imageUrl = articleImageService.uploadFile(file);
+            String imageUrl = articleImageService.uploadArticleImage(file);
             articleImageService.saveImageUrl(article, imageUrl);
             imageUrls.add(imageUrl);
         }

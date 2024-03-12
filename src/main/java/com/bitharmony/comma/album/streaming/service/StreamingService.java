@@ -22,7 +22,7 @@ public class StreamingService {
 
 
     public UploadUrlResponse generateURL(String fileName) {
-        String filePath = ncpMusicUtil.path + UUID.randomUUID() + getExtension(fileName);
+        String filePath = ncpMusicUtil.getPath() + UUID.randomUUID() + getExtension(fileName);
         return UploadUrlResponse.from(ncpMusicUtil.generatePresignedUrl(filePath), filePath);
     }
 

@@ -21,7 +21,13 @@ public class AlbumImageService {
 
 	@Transactional
 	public FileResponse uploadAlbumImage(MultipartFile musicImageFile) {
-		return fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName());
+		FileResponse fileResponse = fileService.getFileResponse(musicImageFile,
+				ncpImageUtil.getBucketName(),
+				ncpImageUtil.getImageCdn(),
+				ncpImageUtil.getImageCdnQueryString()
+		);
+		fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName(), fileResponse.uploadFileName());
+		return fileResponse;
 	}
 
 	public boolean checkImageFile(MultipartFile musicImageFile) {

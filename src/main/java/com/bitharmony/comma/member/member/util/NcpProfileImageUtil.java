@@ -18,11 +18,11 @@ public class NcpProfileImageUtil {
     private final AmazonS3 amazonS3;
 
     @Value("${ncp.s3.profile-image-bucket}")
-    public String bucketName;
+    private String bucketName;
 
     @Value("${ncp.image-optimizer.member-cdn}")
-    public String memberCdn;
+    private String memberCdn;
 
     @Value("${ncp.image-optimizer.query-string}")
-    public String imageCdnQueryString;
+    private String imageCdnQueryString;
 }

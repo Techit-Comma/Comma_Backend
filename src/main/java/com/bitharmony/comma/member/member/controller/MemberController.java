@@ -84,7 +84,7 @@ public class MemberController {
         Member member = memberService.getMemberByUsername(principal.getName());
         String oldImagePath = member.getImageUrl();
 
-        MemberImageResponse memberImageResponse = profileImageService.uploadFile(file);
+        MemberImageResponse memberImageResponse = profileImageService.uploadMemberImage(file);
         if (oldImagePath != null && !oldImagePath.equals(profileImageService.defaultProfileUrl)) {
             profileImageService.deleteFile(oldImagePath);
         }

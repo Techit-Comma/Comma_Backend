@@ -1,7 +1,10 @@
 package com.bitharmony.comma.file.service;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.bitharmony.comma.file.dto.FileResponse;
 import com.bitharmony.comma.file.util.FileType;
+import com.bitharmony.comma.global.exception.community.DeleteFileFailureException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -26,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FileService {
 	private final NcpImageUtil ncpImageUtil;
+	private final AmazonS3 amazonS3;
 
 	public String getUuidFileName(String fileName) {
 		String ext = fileName.substring(fileName.indexOf(".") + 1);
@@ -54,40 +58,50 @@ public class FileService {
 	 *NOTICE: filePath의 맨 앞에 /는 안붙여도됨. ex) history/images
 	 *ncp object storage에 파일 업로드
 	 */
-	public FileResponse uploadFile(MultipartFile multipartFile, String bucketName) {
-		String originalFileName = multipartFile.getOriginalFilename();
-		String uploadFileName = getUuidFileName(originalFileName);
-		String uploadFileUrl;
-
+	public void uploadFile(MultipartFile multipartFile, String bucketName, String uploadFileName) {
 		ObjectMetadata objectMetadata = new ObjectMetadata();
 		objectMetadata.setContentLength(multipartFile.getSize());
 		objectMetadata.setContentType(multipartFile.getContentType());
 
 		try (InputStream inputStream = multipartFile.getInputStream()) {
-			String keyName = uploadFileName;
-
-			// S3에 폴더 및 파일 업로드
-			ncpImageUtil.getAmazonS3().putObject(
-					new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata).withCannedAcl(
+            // S3에 폴더 및 파일 업로드
+			amazonS3.putObject(
+					new PutObjectRequest(bucketName, uploadFileName, inputStream, objectMetadata).withCannedAcl(
 							CannedAccessControlList.PublicRead));
-
-			// S3에 업로드한 폴더 및 파일 URL
-			uploadFileUrl = bucketName + "/" + keyName;
 
 		} catch (IOException e) {
 			throw new AlbumFileException();
 		}
+	}
+
+	public FileResponse getFileResponse(MultipartFile multipartFile, String bucketName, String cdn, String queryString) {
+		String originalFileName = multipartFile.getOriginalFilename();
+		String uploadFileName = getUuidFileName(originalFileName);
 
 		return FileResponse.builder()
 				.originalFileName(originalFileName)
 				.uploadFileName(uploadFileName)
-				.uploadFileUrl(uploadFileUrl)
+				.uploadFilePath(bucketName + "/" + uploadFileName)
+				.uploadFileUrl(cdn + "/" + uploadFileName + queryString)
 				.build();
 	}
 
-	public void deleteFile(String filePath, String bucketName) {
-		if(filePath == null) return;
-		ncpImageUtil.getAmazonS3().deleteObject(new DeleteObjectRequest(bucketName, getFileName(filePath, bucketName)));
+	public String replaceImagePath(String imagePath, String cdn, String queryString) {
+		return imagePath
+				.replace(cdn, "")
+				.substring(1)
+				.replace(queryString, "");
+	}
+
+
+	public void deleteFile(String filename, String bucketName) {
+		if(filename == null) throw new DeleteFileFailureException();
+
+		try {
+			amazonS3.deleteObject(new DeleteObjectRequest(bucketName, filename));
+		} catch (SdkClientException e) {
+			throw new DeleteFileFailureException();
+		}
 	}
 
 	public Optional<MultipartFile> checkFileByType(MultipartFile multipartFile, FileType fileType) {

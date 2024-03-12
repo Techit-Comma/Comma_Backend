@@ -49,7 +49,7 @@ public class AlbumService {
 		album.update(request);
 
 		if (album.getFilePath() != null)
-			fileService.deleteFile(ncpImageUtil.getAlbumFileUrl(album.getImagePath()), ncpImageUtil.getBucketName());
+			fileService.deleteFile(album.getImagePath(), fileService.getFileName(album.getImagePath(), ncpImageUtil.getBucketName()));
 
 		saveAlbum(album);
 		return album;
@@ -58,7 +58,7 @@ public class AlbumService {
 	@Transactional
 	public void delete(Album album) {
 		ncpMusicUtil.deleteFile(album.getFilePath());
-		fileService.deleteFile(album.getImagePath(), ncpImageUtil.getBucketName());
+		fileService.deleteFile(album.getImagePath(), fileService.getFileName(album.getImagePath(), ncpImageUtil.getBucketName()));
 		albumRepository.delete(album);
 	}
 
