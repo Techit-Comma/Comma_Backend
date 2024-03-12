@@ -1,9 +1,13 @@
 package com.bitharmony.comma.album.album.controller;
 
-import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,14 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
+import com.bitharmony.comma.album.album.dto.AlbumFindRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
-import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.exception.AlbumBuyException;
 import com.bitharmony.comma.album.album.exception.AlbumFieldException;
 import com.bitharmony.comma.album.album.exception.AlbumPermissionException;
 import com.bitharmony.comma.album.album.service.AlbumLikeService;
 import com.bitharmony.comma.album.album.service.AlbumService;
+import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
 import com.bitharmony.comma.global.exception.MemberNotFoundException;
 import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.entity.Member;
@@ -165,4 +170,43 @@ public class AlbumController {
 		return GlobalResponse.of("200", member.getAlbumList().stream().map(albumConvertUtil::albumToResponseDto).toList());
 	}
 
+	@PostMapping("/{albumId}/streaming")
+	@PreAuthorize("isAuthenticated()")
+	public GlobalResponse streaming(@PathVariable long albumId, Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		Album album = albumService.getAlbumById(albumId);
+
+		albumService.streamingMember(member, album);
+		return GlobalResponse.of("200");
+	}
+
+	@GetMapping("/streamingTop10Albums")
+	public GlobalResponse getTop10Albums() {
+		List<Sort.Order> sorts = new ArrayList<>();
+		sorts.add(Sort.Order.desc("id"));
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(sorts));
+
+		Page<Album> itemsPage = albumService.streamingTop10Albums(pageable);
+		return GlobalResponse.of("200", itemsPage.map(albumConvertUtil::albumToResponseDto).toList());
+	}
+
+	@GetMapping("/recommendAlbum")
+	public GlobalResponse getRecommendAlbum(Principal principal) {
+		List<Sort.Order> sorts = new ArrayList<>();
+		sorts.add(Sort.Order.desc("id"));
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(sorts));
+
+		Page<Album> itemsPage = albumService.musicRecommendation10Albums(principal, pageable);
+		return GlobalResponse.of("200", itemsPage.map(albumConvertUtil::albumToResponseDto).toList());
+	}
+
+	@GetMapping("/searchAlbum")
+	public GlobalResponse searchAlbum(@Valid AlbumFindRequest request) {
+		List<Sort.Order> sorts = new ArrayList<>();
+		sorts.add(Sort.Order.desc("id"));
+		Pageable pageable = PageRequest.of(request.page() - 1, 10, Sort.by(sorts));
+
+		Page<Album> itemsPage = albumService.search(request, pageable);
+		return GlobalResponse.of("200", itemsPage.map(albumConvertUtil::albumToResponseDto).toList());
+	}
 }
