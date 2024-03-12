@@ -2,6 +2,7 @@ package com.bitharmony.comma.notification.service;
 
 import com.bitharmony.comma.global.util.Channel;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.follow.entity.Follow;
 import com.bitharmony.comma.member.follow.service.FollowService;
 import com.bitharmony.comma.notification.entity.Notification;
 import com.bitharmony.comma.notification.repository.NotificationRepository;
@@ -11,6 +12,7 @@ import com.bitharmony.comma.notification.util.NotificationType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -26,31 +28,39 @@ public class NotificationService {
     private final FollowService followService;
     private final SseEmitterUtil sseEmitterUtil;
 
-    private final static Long TIMEOUT = 60000L * 10;
 
+    @Async
+    @Transactional
     public void sendArtistNotification(Member artist, NotificationType notificationType) {
         String message = artist.getUsername() + notificationType.getMessage();
 
-        // MySQL 저장을 위한 알림 생성
-        Notification notification = notificationRepository.save(Notification.builder()
-                .message(message)
-                .receiver(artist)
-                .build()
-        );
+        // 아티스트를 팔로우하는 모든 팔로워 조회
+        List<Member> followers = followService.getAllFollowerList(artist);
 
-        // Redis Publish, 구독자들에게 메시지 전송
-        redisTemplate.convertAndSend(Channel.ARTIST_NOTIFICATION.getName(), notification.getId()
-                + ":" + artist.getId()
-                + ":" + message
-        );
+        for (Member follower : followers) {
+            // 팔로워 별로 알림 생성
+            Notification notification = notificationRepository.save(Notification.builder()
+                    .message(message)
+                    .receiver(follower)
+                    .build()
+            );
+
+            // Redis Publish, 팔로워에게 메시지 전송 ex_) 1:1:아티스트님의 새 앨범이 등록되었습니다.
+            redisTemplate.convertAndSend(Channel.ARTIST_NOTIFICATION.getName(), follower.getId()
+                    + ":" + notification.getId()
+                    + ":" + message
+            );
+        }
     }
 
-    public SseEmitter subscribe(Member member, String lastEventId) {
-        SseEmitter emitter = new SseEmitter(TIMEOUT);
+
+    @Transactional
+    public SseEmitter subscribe(Member member, String lastEventId) { // TODO: 아티스트 별 SSEEmitter 생성 후 제작 작업 필요
+        SseEmitter emitter = sseEmitterUtil.createSseEmitter();
         String key = member.getId().toString();
 
         emitter.onCompletion(() -> {
-            sseEmitterRepository.deleteByKey(key);
+            sseEmitterUtil.complete(emitter, key);
         });
 
         emitter.onTimeout(emitter::complete);

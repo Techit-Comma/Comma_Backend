@@ -68,8 +68,8 @@ public class FollowService {
                 .map((follow) -> FollowingListResponse.fromEntity(follow.getFollowing())).toList();
     }
 
-    public List<Member> getAllFollowerList(Member caller) {
-        return caller.getFollowerList().stream()
+    public List<Member> getAllFollowerList(Member artist) {
+        return artist.getFollowerList().stream()
                 .map(Follow::getFollower).toList();
     }
 }

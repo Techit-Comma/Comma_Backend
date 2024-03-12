@@ -31,12 +31,6 @@ public class NotificationController {
         return notificationService.subscribe(member, lastEventId);
     }
 
-/*    @PreAuthorize("isAuthenticated()")
-    @GetMapping
-    public List<Notification> getNotification() {
-        return notificationService.getNotification();
-    }*/
-
     // 알림 읽음 처리
     @PreAuthorize("isAuthenticated()")
     @PostMapping
