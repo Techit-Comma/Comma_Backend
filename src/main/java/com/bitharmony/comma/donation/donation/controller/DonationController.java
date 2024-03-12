@@ -5,7 +5,6 @@ import com.bitharmony.comma.donation.donation.dto.DonationOnceRequestDto;
 import com.bitharmony.comma.donation.donation.dto.DonationRegularFindResponseDto;
 import com.bitharmony.comma.donation.donation.dto.DonationRegularRequestDto;
 import com.bitharmony.comma.donation.donation.dto.DonationRegularUpdateRequestDto;
-import com.bitharmony.comma.donation.dto.*;
 import com.bitharmony.comma.donation.donation.service.DonationRegularService;
 import com.bitharmony.comma.donation.donation.service.DonationService;
 import com.bitharmony.comma.global.exception.member.NotAuthorizedException;

@@ -1,7 +1,6 @@
 package com.bitharmony.comma.member.member.controller;
 
 import com.bitharmony.comma.global.response.GlobalResponse;
-import com.bitharmony.comma.member.dto.*;
 import com.bitharmony.comma.member.member.dto.MemberImageResponse;
 import com.bitharmony.comma.member.member.dto.MemberJoinRequest;
 import com.bitharmony.comma.member.member.dto.MemberLoginRequest;
