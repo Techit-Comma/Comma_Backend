@@ -17,7 +17,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
 @Service
@@ -100,7 +99,6 @@ public class NotificationService {
                 .orElseThrow(NotificationNotFoundException::new);
     }
 
-    @Transactional(readOnly = true)
     public void checkNotificationReceiver(Long receiverId, Long memberId) {
         if (!receiverId.equals(memberId)) {
             throw new NotAuthorizedException();

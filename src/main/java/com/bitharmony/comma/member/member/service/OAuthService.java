@@ -17,12 +17,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.Decoders;
-import jakarta.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -75,7 +75,7 @@ public class OAuthService {
                 .build();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Member getMemberByProviderId(String ProviderId, Member memberToEntity) {
         Optional<Member> member = memberRepository.findByProviderId(ProviderId);
 

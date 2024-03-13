@@ -13,10 +13,10 @@ import com.bitharmony.comma.album.playlist.entity.PlayListAlbum;
 import com.bitharmony.comma.album.playlist.entity.Playlist;
 import com.bitharmony.comma.album.playlist.repository.PlaylistAlbumRepository;
 import com.bitharmony.comma.album.playlist.repository.PlaylistRepository;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +37,7 @@ public class PlaylistService {
         playlistRepository.save(playlist);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<PlaylistResponse> getAllPlaylist(Member member) {
         List<Playlist> playlists = playlistRepository.findAllByProducerId(member.getId());
 
@@ -49,7 +49,7 @@ public class PlaylistService {
                 )).toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PlaylistDetailResponse getAlbumList(Long playlistId) {
         Playlist playlist = getPlaylistById(playlistId);
         List<PlayListAlbum> playListAlbums = playlistAlbumRepository.findAllByPlaylistId(playlistId);
@@ -112,13 +112,12 @@ public class PlaylistService {
         playlistAlbumRepository.deleteById(playListAlbum.getId());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Playlist getPlaylistById(Long playlistId) {
         return playlistRepository.findById(playlistId)
                 .orElseThrow(PlaylistNotFoundException::new);
     }
 
-    @Transactional
     public void checkPlaylistProducer(Long producerId, Long memberId) {
         if (!producerId.equals(memberId)) {
             throw new NotAuthorizedException();
