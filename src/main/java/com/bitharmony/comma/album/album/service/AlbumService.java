@@ -15,13 +15,13 @@ import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.album.album.dto.AlbumFindRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
-import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
+import com.bitharmony.comma.global.exception.album.AlbumNotFoundException;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
-import com.bitharmony.comma.album.file.service.FileService;
-import com.bitharmony.comma.album.file.util.NcpImageUtil;
-import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.streaming.util.NcpMusicUtil;
+import com.bitharmony.comma.file.service.FileService;
+import com.bitharmony.comma.album.album.util.NcpImageUtil;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.album.streaming.util.NcpMusicUtil;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class AlbumService {
 		album.update(request);
 
 		if (album.getFilePath() != null)
-			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()), ncpImageUtil.getBucketName());
+			fileService.deleteFile(album.getImagePath(), fileService.getFileName(album.getImagePath(), ncpImageUtil.getBucketName()));
 
 		saveAlbum(album);
 		return album;
@@ -58,7 +58,7 @@ public class AlbumService {
 	@Transactional
 	public void delete(Album album) {
 		ncpMusicUtil.deleteFile(album.getFilePath());
-		fileService.deleteFile(album.getImagePath(), ncpImageUtil.getBucketName());
+		fileService.deleteFile(album.getImagePath(), fileService.getFileName(album.getImagePath(), ncpImageUtil.getBucketName()));
 		albumRepository.delete(album);
 	}
 
@@ -87,39 +87,29 @@ public class AlbumService {
 	public boolean canRelease(String name, Member member) {
 		if (member == null)
 			return false;
-		if (albumRepository.findByAlbumname(name).isPresent())
-			return false;
-
-		return true;
-	}
+        return albumRepository.findByAlbumname(name).isEmpty();
+    }
 
 	public boolean canEdit(Album album, Principal principal, @Valid AlbumEditRequest request, Member member) {
 		if (member == null)
 			return false;
 		if (!album.getMember().getUsername().equals(principal.getName()))
 			return false;
-		if (albumRepository.findByAlbumname(request.albumname()).isPresent() && !album.getAlbumname().equals(request.albumname()))
-			return false;
-
-		return true;
-	}
+        return albumRepository.findByAlbumname(request.albumname()).isEmpty()
+                || album.getAlbumname().equals(request.albumname());
+    }
 
 	public boolean canDelete(Album album, Principal principal) {
-		if (!album.getMember().getUsername().equals(principal.getName()))
-			return false;
-		return true;
-	}
+        return album.getMember().getUsername().equals(principal.getName());
+    }
 
 	public boolean canBuy(Member member, Album album) {
 		if (member.getCredit() < album.getPrice())
 			return false;
 		if (album.getMember().getUsername().equals(member.getUsername()))
 			return false;
-		if (!album.isPermit())
-			return false;
-
-		return true;
-	}
+        return album.isPermit();
+    }
 
 	@Transactional
 	public void resetStreamingCounts() {

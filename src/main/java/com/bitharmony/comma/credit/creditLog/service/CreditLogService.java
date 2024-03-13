@@ -3,7 +3,7 @@ package com.bitharmony.comma.credit.creditLog.service;
 import com.bitharmony.comma.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.credit.creditLog.repository.CreditLogRepository;
 import com.bitharmony.comma.global.exception.credit.CreditLogNotFoundException;
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,7 +39,7 @@ public class CreditLogService {
 
     @Transactional
     public void addCreditLog(Member member, CreditLog.EventType eventType, long creditChangeAmount) {
-        CreditLog creditLog = new CreditLog().builder()
+        CreditLog creditLog = CreditLog.builder()
                 .member(member)
                 .eventType(eventType)
                 .creditChangeAmount(creditChangeAmount)

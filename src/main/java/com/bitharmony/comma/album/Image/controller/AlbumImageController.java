@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.Image.service.AlbumImageService;
-import com.bitharmony.comma.album.file.service.FileService;
+import com.bitharmony.comma.file.service.FileService;
 import com.bitharmony.comma.global.response.GlobalResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class AlbumImageController {
 	}
 
 	@GetMapping("/status")
-	public GlobalResponse encodeStatus(@RequestParam(value = "filePath", required = true) String filePath) {
+	public GlobalResponse encodeStatus(@RequestParam(value = "filePath") String filePath) {
 		return GlobalResponse.of("200", fileService.isFileUploadedToS3(filePath));
 	}
 }

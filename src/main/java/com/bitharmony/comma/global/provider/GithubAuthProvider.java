@@ -1,8 +1,8 @@
 package com.bitharmony.comma.global.provider;
 
 import com.bitharmony.comma.global.exception.member.GetTokenFailureException;
-import com.bitharmony.comma.member.dto.GithubMemberResponse;
-import com.bitharmony.comma.member.dto.GithubOauthResponse;
+import com.bitharmony.comma.member.member.dto.GithubMemberResponse;
+import com.bitharmony.comma.member.member.dto.GithubOauthResponse;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;

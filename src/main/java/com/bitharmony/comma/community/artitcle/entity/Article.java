@@ -1,7 +1,7 @@
 package com.bitharmony.comma.community.artitcle.entity;
 
 import com.bitharmony.comma.community.comment.entity.Comment;
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

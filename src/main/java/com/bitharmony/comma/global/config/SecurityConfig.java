@@ -1,6 +1,6 @@
 package com.bitharmony.comma.global.config;
 
-import com.bitharmony.comma.global.exception.CustomAccessDeniedHandled;
+import com.bitharmony.comma.global.exception.CustomAccessDeniedHandler;
 import com.bitharmony.comma.global.exception.CustomAuthenticationEntryPoint;
 import com.bitharmony.comma.global.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-    private final CustomAccessDeniedHandled accessDeniedHandled;
+    private final CustomAccessDeniedHandler accessDeniedHandled;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

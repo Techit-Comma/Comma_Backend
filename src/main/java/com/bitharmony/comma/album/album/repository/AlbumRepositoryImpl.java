@@ -58,12 +58,9 @@ public class AlbumRepositoryImpl implements AlbumRepositoryCustom{
 				conditions.add(album.price.gt(0));
 			}
 
-			BooleanExpression combinedConditions = conditions.stream().reduce(BooleanExpression::or).orElse(null);
+            conditions.stream().reduce(BooleanExpression::or).ifPresent(builder::and);
 
-			if (combinedConditions != null) {
-				builder.and(combinedConditions);
-			}
-		}
+        }
 
 
 		JPAQuery<Album> albumsQuery = jpaQueryFactory
