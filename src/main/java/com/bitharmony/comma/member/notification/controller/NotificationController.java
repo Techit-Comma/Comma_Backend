@@ -23,8 +23,7 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final MemberService memberService;
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping(value = "/subscribe", produces = "text/event-stream")
+    @GetMapping(value = "/subscribe")
     public CompletableFuture<GlobalResponse<?>> getNotification(Principal principal) {
         Member member = memberService.getMemberByUsername(principal.getName());
         CompletableFuture<String> completableFuture = notificationService.getCompletableFuture(

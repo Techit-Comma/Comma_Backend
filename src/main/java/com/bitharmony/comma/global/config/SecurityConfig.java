@@ -49,7 +49,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/member/login", "/member/join","/member/{username}" ,"/reissue",
                             "/album/list", "/album/{albumId}", "/album/{username}", "/album/detail/{id}",
                             "/streaming/status", "/community/articles/user/{username}", "/community/comments/{articleId}",
-                            "/oauth/**").permitAll();
+                            "/oauth/**", "/notification/subscribe").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/playlist/{playlistId}").permitAll();
                     auth.anyRequest().authenticated(); // 그 외의 것들은 모두 인증, 인가를 거치도록 설정
                 })

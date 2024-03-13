@@ -46,7 +46,7 @@ public class NotificationService {
                     .build()
             );
 
-            // Redis Publish, 팔로워에게 메시지 전송 ex_) 1:1:아티스트님의 새 앨범이 등록되었습니다.
+            // Redis Publish, 팔로워에게 메시지 전송 ex_) 2:1:아티스트님의 새 앨범이 등록되었습니다.
             redisTemplate.convertAndSend(Channel.ARTIST_NOTIFICATION.getName(), follower.getId()
                     + ":" + notification.getId()
                     + ":" + message
