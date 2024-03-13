@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    List<Notification> findAllByReceiverIdAndIdGreaterThanOrderByCreateDateAsc(Long userId, Long lastEventId);
+    List<Notification> findAllBySubscriberIdOrderByCreateDateAsc(Long userId);
 }

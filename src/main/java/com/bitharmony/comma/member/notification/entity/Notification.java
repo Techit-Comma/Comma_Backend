@@ -28,9 +28,16 @@ public class Notification {
     @Column(nullable = false)
     private String message;
 
+    @Column(nullable = false)
+    private String redirectUrl;
+
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Member receiver;
+    private Member publisher;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Member subscriber;
 
     @Builder.Default
     private Boolean isRead = false;

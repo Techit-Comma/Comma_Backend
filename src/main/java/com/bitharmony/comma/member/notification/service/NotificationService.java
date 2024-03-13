@@ -1,14 +1,17 @@
 package com.bitharmony.comma.member.notification.service;
 
+import com.bitharmony.comma.global.exception.member.NotAuthorizedException;
+import com.bitharmony.comma.global.exception.member.NotificationNotFoundException;
 import com.bitharmony.comma.global.util.Channel;
 import com.bitharmony.comma.member.member.entity.Member;
 import com.bitharmony.comma.member.follow.service.FollowService;
+import com.bitharmony.comma.member.notification.dto.NotificationResponse;
 import com.bitharmony.comma.member.notification.entity.Notification;
+import com.bitharmony.comma.member.notification.repository.CompletableFutureRepository;
 import com.bitharmony.comma.member.notification.repository.NotificationRepository;
-import com.bitharmony.comma.member.notification.repository.SseEmitterRepository;
-import com.bitharmony.comma.member.notification.repository.SseEmitterUtil;
 import com.bitharmony.comma.member.notification.util.NotificationType;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -23,14 +26,12 @@ public class NotificationService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final NotificationRepository notificationRepository;
-    private final SseEmitterRepository sseEmitterRepository;
+    private final CompletableFutureRepository completableFutureRepository;
     private final FollowService followService;
-    private final SseEmitterUtil sseEmitterUtil;
-
 
     @Async
     @Transactional
-    public void sendArtistNotification(Member artist, NotificationType notificationType) {
+    public void sendArtistNotification(Member artist, NotificationType notificationType, Long contentId) {
         String message = artist.getUsername() + notificationType.getMessage();
 
         // 아티스트를 팔로우하는 모든 팔로워 조회
@@ -40,7 +41,9 @@ public class NotificationService {
             // 팔로워 별로 알림 생성
             Notification notification = notificationRepository.save(Notification.builder()
                     .message(message)
-                    .receiver(follower)
+                    .redirectUrl(notificationType.getRedirectUrl() + contentId)
+                    .publisher(artist)
+                    .subscriber(follower)
                     .build()
             );
 
@@ -53,31 +56,66 @@ public class NotificationService {
     }
 
 
+    @Transactional(readOnly = true)
+    public List<NotificationResponse> getNotifications(Member member) {
+        return notificationRepository.findAllBySubscriberIdOrderByCreateDateAsc(member.getId()).stream()
+                .map(this::convertToNotificationResponse)
+                .toList();
+    }
+
+
+    public CompletableFuture<String> getCompletableFuture(String key) {
+        return completableFutureRepository.findByKey(key)
+                .orElseGet(() -> {
+                    CompletableFuture<String> completableFuture = new CompletableFuture<>();
+                    completableFutureRepository.save(key, completableFuture);
+                    return completableFuture;
+                });
+    }
+
     @Transactional
-    public SseEmitter subscribe(Member member, String lastEventId) { // TODO: 아티스트 별 SSEEmitter 생성 후 제작 작업 필요
-        SseEmitter emitter = sseEmitterUtil.createSseEmitter();
-        String key = member.getId().toString();
+    public void readNotification(Long notificationId, Member member) {
+        Notification notification = getNotification(notificationId);
+        checkNotificationReceiver(notification.getSubscriber().getId(), member.getId());
 
-        emitter.onCompletion(() -> sseEmitterUtil.complete(emitter, key));
-        emitter.onTimeout(emitter::complete);
+        Notification _notification = notification.toBuilder()
+                .isRead(true)
+                .build();
 
-        sseEmitterRepository.save(key, emitter);
+        notificationRepository.save(_notification);
+    }
 
-        if (!lastEventId.isEmpty()) {
-            // MySQL에서 해당 userId에 대한 미수신 이벤트 조회
-            List<Notification> missedNotifications =
-                    notificationRepository.findAllByReceiverIdAndIdGreaterThanOrderByCreateDateAsc(
-                            member.getId(),
-                            Long.parseLong(lastEventId)
-                    );
+    @Transactional
+    public void removeNotification(Long notificationId, Member member) {
+        Notification notification = getNotification(notificationId);
+        checkNotificationReceiver(notification.getSubscriber().getId(), member.getId());
 
-            // 미수신 된 이벤트가 있다면 클라이언트로 전송
-            missedNotifications.forEach(notification -> sseEmitterUtil.sendEventWithSseEmitter(
-                    emitter, notification.getId().toString(), notification.getMessage())
-            );
+        notificationRepository.deleteById(notificationId);
+    }
+
+
+    @Transactional(readOnly = true)
+    public Notification getNotification(Long notificationId) {
+       return notificationRepository.findById(notificationId)
+                .orElseThrow(NotificationNotFoundException::new);
+    }
+
+    @Transactional(readOnly = true)
+    public void checkNotificationReceiver(Long receiverId, Long memberId) {
+        if (!receiverId.equals(memberId)) {
+            throw new NotAuthorizedException();
         }
+    }
 
-        return emitter;
+    private NotificationResponse convertToNotificationResponse(Notification notification) {
+        return NotificationResponse.builder()
+                .id(notification.getId())
+                .message(notification.getMessage())
+                .redirectUrl(notification.getRedirectUrl())
+                .publisherName(notification.getPublisher().getNickname())
+                .isRead(notification.getIsRead())
+                .createDate(notification.getCreateDate())
+                .build();
     }
 
 }
