@@ -10,6 +10,7 @@ import com.bitharmony.comma.member.notification.entity.Notification;
 import com.bitharmony.comma.member.notification.repository.CompletableFutureRepository;
 import com.bitharmony.comma.member.notification.repository.NotificationRepository;
 import com.bitharmony.comma.member.notification.util.NotificationType;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
@@ -90,6 +91,12 @@ public class NotificationService {
         checkNotificationReceiver(notification.getSubscriber().getId(), member.getId());
 
         notificationRepository.deleteById(notificationId);
+    }
+
+    @Transactional
+    public void removeOldNotification() {
+        LocalDateTime limitDateTime = LocalDateTime.now().minusWeeks(2);
+        notificationRepository.deleteAllByCreateDateBefore(limitDateTime);
     }
 
 
