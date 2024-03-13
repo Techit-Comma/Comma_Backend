@@ -1,5 +1,7 @@
 package com.bitharmony.comma.album.album.service;
 
+import com.bitharmony.comma.member.notification.service.NotificationService;
+import com.bitharmony.comma.member.notification.util.NotificationType;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AlbumService {
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
+	private final NotificationService notificationService;
 	private final NcpImageUtil ncpImageUtil;
 	private final NcpMusicUtil ncpMusicUtil;
 	private final AlbumConvertUtil albumConvertUtil;
@@ -41,7 +44,10 @@ public class AlbumService {
 	public Album release(AlbumCreateRequest request, Member member) {
 		Album album = request.toEntity();
 		album.updateReleaseMember(member);
-		return saveAlbum(album);
+		saveAlbum(album);
+
+		notificationService.sendArtistNotification(member, NotificationType.NEW_ALBUM, album.getId()); // 알림 발송
+		return album;
 	}
 
 	@Transactional
