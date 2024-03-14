@@ -1,4 +1,4 @@
-package com.bitharmony.comma.member.member.dto;
+package com.bitharmony.comma.member.auth.dto;
 
 import lombok.Builder;
 

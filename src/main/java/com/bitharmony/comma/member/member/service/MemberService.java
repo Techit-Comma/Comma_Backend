@@ -15,7 +15,7 @@ import com.bitharmony.comma.global.exception.member.MemberDuplicateException;
 import com.bitharmony.comma.global.exception.member.MemberNotFoundException;
 import com.bitharmony.comma.global.security.SecurityUser;
 import com.bitharmony.comma.global.util.JwtUtil;
-import com.bitharmony.comma.member.member.dto.JwtCreateRequest;
+import com.bitharmony.comma.member.auth.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.member.dto.MemberLoginResponse;
 import com.bitharmony.comma.member.member.dto.MemberReturnResponse;
 import com.bitharmony.comma.member.member.entity.Member;

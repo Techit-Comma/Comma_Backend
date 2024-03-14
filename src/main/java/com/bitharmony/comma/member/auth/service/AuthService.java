@@ -1,7 +1,7 @@
 package com.bitharmony.comma.member.auth.service;
 
 import com.bitharmony.comma.global.util.JwtUtil;
-import com.bitharmony.comma.member.member.dto.JwtCreateRequest;
+import com.bitharmony.comma.member.auth.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.member.dto.MemberLoginResponse;
 import com.bitharmony.comma.member.auth.dto.JwtRegenerateRequest;
 import com.bitharmony.comma.global.exception.member.InvalidRefreshTokenException;

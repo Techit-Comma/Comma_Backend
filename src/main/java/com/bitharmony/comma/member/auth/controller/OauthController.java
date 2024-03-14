@@ -1,8 +1,8 @@
-package com.bitharmony.comma.member.member.controller;
+package com.bitharmony.comma.member.auth.controller;
 
 import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.member.dto.MemberLoginResponse;
-import com.bitharmony.comma.member.member.service.OAuthService;
+import com.bitharmony.comma.member.auth.service.OAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

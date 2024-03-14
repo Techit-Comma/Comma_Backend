@@ -1,5 +1,6 @@
-package com.bitharmony.comma.member.notification.repository;
+package com.bitharmony.comma.album.streaming.util;
 
+import com.bitharmony.comma.album.streaming.repository.SseEmitterRepository;
 import com.bitharmony.comma.global.exception.streaming.SseEmitterNotFoundException;
 import com.bitharmony.comma.global.exception.streaming.SseEmitterSendingException;
 import java.io.IOException;

@@ -1,15 +1,15 @@
-package com.bitharmony.comma.member.member.service;
+package com.bitharmony.comma.member.auth.service;
 
 import com.bitharmony.comma.global.exception.member.MemberNotFoundException;
 import com.bitharmony.comma.global.exception.member.MemberInfoMappingException;
-import com.bitharmony.comma.global.provider.GithubAuthProvider;
-import com.bitharmony.comma.global.provider.GoogleAuthProvider;
+import com.bitharmony.comma.member.auth.provider.GithubAuthProvider;
+import com.bitharmony.comma.member.auth.provider.GoogleAuthProvider;
 import com.bitharmony.comma.global.util.JwtUtil;
-import com.bitharmony.comma.member.member.dto.GithubMemberResponse;
-import com.bitharmony.comma.member.member.dto.GithubOauthResponse;
-import com.bitharmony.comma.member.member.dto.GoogleMemberResponse;
-import com.bitharmony.comma.member.member.dto.GoogleOauthResponse;
-import com.bitharmony.comma.member.member.dto.JwtCreateRequest;
+import com.bitharmony.comma.member.auth.dto.GithubMemberResponse;
+import com.bitharmony.comma.member.auth.dto.GithubOauthResponse;
+import com.bitharmony.comma.member.auth.dto.GoogleMemberResponse;
+import com.bitharmony.comma.member.auth.dto.GoogleOauthResponse;
+import com.bitharmony.comma.member.auth.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.member.dto.MemberLoginResponse;
 import com.bitharmony.comma.member.member.entity.Member;
 import com.bitharmony.comma.member.member.repository.MemberRepository;
