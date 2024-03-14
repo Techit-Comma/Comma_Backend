@@ -7,17 +7,17 @@ import com.bitharmony.comma.member.member.entity.Member;
 import com.bitharmony.comma.member.follow.service.FollowService;
 import com.bitharmony.comma.member.notification.dto.NotificationResponse;
 import com.bitharmony.comma.member.notification.entity.Notification;
-import com.bitharmony.comma.member.notification.repository.CompletableFutureRepository;
+import com.bitharmony.comma.member.notification.repository.DeferredResultRepository;
 import com.bitharmony.comma.member.notification.repository.NotificationRepository;
+import com.bitharmony.comma.member.notification.util.NotificationConvertUtil;
 import com.bitharmony.comma.member.notification.util.NotificationType;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.async.DeferredResult;
 
 
 @Service
@@ -26,10 +26,12 @@ public class NotificationService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final NotificationRepository notificationRepository;
-    private final CompletableFutureRepository completableFutureRepository;
+    private final DeferredResultRepository deferredResultRepository;
+    private final NotificationConvertUtil notificationConvertUtil;
     private final FollowService followService;
 
-    @Async
+    private final static Long TIMEOUT = 60000L;
+
     @Transactional
     public void sendArtistNotification(Member artist, NotificationType notificationType, Long contentId) {
         String message = artist.getUsername() + notificationType.getMessage();
@@ -55,23 +57,21 @@ public class NotificationService {
         }
     }
 
+    public DeferredResult<List<NotificationResponse>> getDeferredResult(String key) {
+        return deferredResultRepository.findByKey(key)
+                .orElseGet(() -> {
+                    DeferredResult<List<NotificationResponse>> deferredResult = new DeferredResult<>(TIMEOUT);
+                    deferredResultRepository.save(key, deferredResult);
+                    return deferredResult;
+                });
+    }
 
-    @Transactional(readOnly = true)
-    public List<NotificationResponse> getNotifications(Member member) {
-        return notificationRepository.findAllBySubscriberIdOrderByCreateDateAsc(member.getId()).stream()
-                .map(this::convertToNotificationResponse)
+    public List<NotificationResponse> getNotifications(String subscriberId) {
+        return notificationRepository.findAllBySubscriberIdOrderByCreateDateAsc(Long.parseLong(subscriberId)).stream()
+                .map(notificationConvertUtil::convertToNotificationResponse)
                 .toList();
     }
 
-
-    public CompletableFuture<String> getCompletableFuture(String key) {
-        return completableFutureRepository.findByKey(key)
-                .orElseGet(() -> {
-                    CompletableFuture<String> completableFuture = new CompletableFuture<>();
-                    completableFutureRepository.save(key, completableFuture);
-                    return completableFuture;
-                });
-    }
 
     @Transactional
     public void readNotification(Long notificationId, Member member) {
@@ -110,17 +110,6 @@ public class NotificationService {
         if (!receiverId.equals(memberId)) {
             throw new NotAuthorizedException();
         }
-    }
-
-    private NotificationResponse convertToNotificationResponse(Notification notification) {
-        return NotificationResponse.builder()
-                .id(notification.getId())
-                .message(notification.getMessage())
-                .redirectUrl(notification.getRedirectUrl())
-                .publisherName(notification.getPublisher().getNickname())
-                .isRead(notification.getIsRead())
-                .createDate(notification.getCreateDate())
-                .build();
     }
 
 }

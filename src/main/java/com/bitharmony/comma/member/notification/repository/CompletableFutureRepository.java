@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CompletableFutureRepository {
+public class CompletableFutureRepository { // 향후 수정이 있을 수도 있어 남겨둠.
     private final Map<String, CompletableFuture<String>> completableFutureMap = new ConcurrentHashMap<>();
 
     public void save(String key, CompletableFuture<String> completableFuture) {
