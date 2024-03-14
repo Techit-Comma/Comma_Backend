@@ -3,6 +3,7 @@ package com.bitharmony.comma.album.streaming.service;
 import com.bitharmony.comma.album.streaming.dto.UploadUrlResponse;
 import com.bitharmony.comma.album.streaming.util.EncodeStatus;
 import com.bitharmony.comma.album.streaming.util.NcpMusicUtil;
+import com.bitharmony.comma.album.streaming.util.SseEmitterUtil;
 import com.bitharmony.comma.global.exception.streaming.EncodingFailureException;
 import com.bitharmony.comma.global.exception.streaming.EncodingStatusNotFoundException;
 import com.bitharmony.comma.global.util.Channel;
@@ -12,12 +13,14 @@ import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 @RequiredArgsConstructor
 public class StreamingService {
 
     private final RedisTemplate<String, String> redisTemplate;
+    private final SseEmitterUtil sseEmitterUtil;
     private final NcpMusicUtil ncpMusicUtil;
 
 
@@ -32,15 +35,19 @@ public class StreamingService {
 
     public void encodeStatus(String filePath, String outputType, EncodeStatus status) {
         switch (status) {
-            case WAITING -> sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.WAITING);
-            case RUNNING -> sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.RUNNING);
-            case COMPLETE -> sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.COMPLETE);
+            case WAITING -> sendEncodingStatus(filePath, outputType, EncodeStatus.WAITING);
+            case RUNNING -> sendEncodingStatus(filePath, outputType, EncodeStatus.RUNNING);
+            case COMPLETE -> sendEncodingStatus(filePath, outputType, EncodeStatus.COMPLETE);
             case FAILURE -> {
-                sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.FAILURE);
+                sendEncodingStatus(filePath, outputType, EncodeStatus.FAILURE);
                 throw new EncodingFailureException();
             }
-            case CANCELED -> sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.CANCELED);
+            case CANCELED -> sendEncodingStatus(filePath, outputType, EncodeStatus.CANCELED);
         }
+    }
+
+    public SseEmitter subscribe(String filePath) {
+        return sseEmitterUtil.generateSseEmitter(filePath);
     }
 
     private void sendEncodingStatus(String filePath, String outputType, EncodeStatus status) {
