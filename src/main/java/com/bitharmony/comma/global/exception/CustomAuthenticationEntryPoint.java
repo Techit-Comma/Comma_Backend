@@ -15,23 +15,25 @@ import org.springframework.stereotype.Component;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException {
+            AuthenticationException authException) throws IOException {
         Object exception = request.getAttribute("exception");
+
         if (exception instanceof ExpiredAccessTokenException tokenException) {
-            setResponse(response, tokenException);
+            setResponse(response, tokenException.getStatusCode(), tokenException.getMessage());
             return;
         }
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        String errorMessage = authException.getMessage();
+        setResponse(response, HttpServletResponse.SC_UNAUTHORIZED, errorMessage);
     }
 
-    public void setResponse(HttpServletResponse response, ExpiredAccessTokenException ex) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    public void setResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
+        response.setStatus(statusCode);
         response.setContentType("application/json; charset=UTF-8");
 
         JSONObject responseJson = new JSONObject();
-        responseJson.put("message", ex.getMessage());
-        responseJson.put("code", ex.getStatusCode());
+        responseJson.put("message", message);
+        responseJson.put("code", statusCode);
         response.getWriter().print(responseJson);
     }
 }
