@@ -11,7 +11,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.entity.QAlbum;
-import com.bitharmony.comma.member.entity.QMember;
+import com.bitharmony.comma.member.member.entity.QMember;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;

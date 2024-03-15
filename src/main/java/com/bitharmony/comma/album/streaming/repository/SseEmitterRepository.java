@@ -1,4 +1,4 @@
-package com.bitharmony.comma.member.notification.repository;
+package com.bitharmony.comma.album.streaming.repository;
 
 
 import java.util.List;

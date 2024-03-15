@@ -3,7 +3,6 @@ package com.bitharmony.comma.album.streaming.controller;
 import com.bitharmony.comma.album.streaming.dto.EncodeStatusRequest;
 import com.bitharmony.comma.album.streaming.dto.UploadUrlRequest;
 import com.bitharmony.comma.album.streaming.dto.UploadUrlResponse;
-import com.bitharmony.comma.album.streaming.service.EncodingSseProvider;
 import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.album.streaming.service.StreamingService;
 import jakarta.validation.Valid;
@@ -25,7 +24,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class StreamingController {
 
     private final StreamingService streamingService;
-    private final EncodingSseProvider encodingSseProvider;
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/upload") // get upload presigned url
@@ -42,7 +40,7 @@ public class StreamingController {
 
     @GetMapping("/status") // sse emitter subscribe
     public SseEmitter getEncodeStatus(@RequestParam(name = "filePath") String filePath) {
-        return encodingSseProvider.subscribe(streamingService.extractUUID(filePath));
+        return streamingService.subscribe(streamingService.extractUUID(filePath));
     }
 
 }

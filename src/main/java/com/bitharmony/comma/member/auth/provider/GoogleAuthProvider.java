@@ -1,7 +1,7 @@
-package com.bitharmony.comma.global.provider;
+package com.bitharmony.comma.member.auth.provider;
 
 import com.bitharmony.comma.global.exception.member.GetTokenFailureException;
-import com.bitharmony.comma.member.member.dto.GoogleOauthResponse;
+import com.bitharmony.comma.member.auth.dto.GoogleOauthResponse;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;

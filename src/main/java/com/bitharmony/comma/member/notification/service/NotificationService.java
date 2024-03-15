@@ -1,20 +1,23 @@
 package com.bitharmony.comma.member.notification.service;
 
+import com.bitharmony.comma.global.exception.member.NotAuthorizedException;
+import com.bitharmony.comma.global.exception.member.NotificationNotFoundException;
 import com.bitharmony.comma.global.util.Channel;
 import com.bitharmony.comma.member.member.entity.Member;
 import com.bitharmony.comma.member.follow.service.FollowService;
+import com.bitharmony.comma.member.notification.dto.NotificationResponse;
 import com.bitharmony.comma.member.notification.entity.Notification;
+import com.bitharmony.comma.member.notification.repository.DeferredResultRepository;
 import com.bitharmony.comma.member.notification.repository.NotificationRepository;
-import com.bitharmony.comma.member.notification.repository.SseEmitterRepository;
-import com.bitharmony.comma.member.notification.repository.SseEmitterUtil;
+import com.bitharmony.comma.member.notification.util.NotificationConvertUtil;
 import com.bitharmony.comma.member.notification.util.NotificationType;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.context.request.async.DeferredResult;
 
 
 @Service
@@ -23,14 +26,14 @@ public class NotificationService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final NotificationRepository notificationRepository;
-    private final SseEmitterRepository sseEmitterRepository;
+    private final DeferredResultRepository deferredResultRepository;
+    private final NotificationConvertUtil notificationConvertUtil;
     private final FollowService followService;
-    private final SseEmitterUtil sseEmitterUtil;
 
+    private final static Long TIMEOUT = 60000L;
 
-    @Async
     @Transactional
-    public void sendArtistNotification(Member artist, NotificationType notificationType) {
+    public void sendArtistNotification(Member artist, NotificationType notificationType, Long contentId) {
         String message = artist.getUsername() + notificationType.getMessage();
 
         // 아티스트를 팔로우하는 모든 팔로워 조회
@@ -40,11 +43,13 @@ public class NotificationService {
             // 팔로워 별로 알림 생성
             Notification notification = notificationRepository.save(Notification.builder()
                     .message(message)
-                    .receiver(follower)
+                    .redirectUrl(notificationType.getRedirectUrl() + contentId)
+                    .publisher(artist)
+                    .subscriber(follower)
                     .build()
             );
 
-            // Redis Publish, 팔로워에게 메시지 전송 ex_) 1:1:아티스트님의 새 앨범이 등록되었습니다.
+            // Redis Publish, 팔로워에게 메시지 전송 ex_) 2:1:아티스트님의 새 앨범이 등록되었습니다.
             redisTemplate.convertAndSend(Channel.ARTIST_NOTIFICATION.getName(), follower.getId()
                     + ":" + notification.getId()
                     + ":" + message
@@ -52,32 +57,59 @@ public class NotificationService {
         }
     }
 
+    public DeferredResult<List<NotificationResponse>> getDeferredResult(String key) {
+        return deferredResultRepository.findByKey(key)
+                .orElseGet(() -> {
+                    DeferredResult<List<NotificationResponse>> deferredResult = new DeferredResult<>(TIMEOUT);
+                    deferredResultRepository.save(key, deferredResult);
+                    return deferredResult;
+                });
+    }
+
+    public List<NotificationResponse> getNotifications(String subscriberId) {
+        return notificationRepository.findAllBySubscriberIdOrderByCreateDateAsc(Long.parseLong(subscriberId)).stream()
+                .map(notificationConvertUtil::convertToNotificationResponse)
+                .toList();
+    }
+
 
     @Transactional
-    public SseEmitter subscribe(Member member, String lastEventId) { // TODO: 아티스트 별 SSEEmitter 생성 후 제작 작업 필요
-        SseEmitter emitter = sseEmitterUtil.createSseEmitter();
-        String key = member.getId().toString();
+    public void readNotification(Long notificationId, Member member) {
+        Notification notification = getNotification(notificationId);
+        checkNotificationReceiver(notification.getSubscriber().getId(), member.getId());
 
-        emitter.onCompletion(() -> sseEmitterUtil.complete(emitter, key));
-        emitter.onTimeout(emitter::complete);
+        Notification _notification = notification.toBuilder()
+                .isRead(true)
+                .build();
 
-        sseEmitterRepository.save(key, emitter);
+        notificationRepository.save(_notification);
+    }
 
-        if (!lastEventId.isEmpty()) {
-            // MySQL에서 해당 userId에 대한 미수신 이벤트 조회
-            List<Notification> missedNotifications =
-                    notificationRepository.findAllByReceiverIdAndIdGreaterThanOrderByCreateDateAsc(
-                            member.getId(),
-                            Long.parseLong(lastEventId)
-                    );
+    @Transactional
+    public void removeNotification(Long notificationId, Member member) {
+        Notification notification = getNotification(notificationId);
+        checkNotificationReceiver(notification.getSubscriber().getId(), member.getId());
 
-            // 미수신 된 이벤트가 있다면 클라이언트로 전송
-            missedNotifications.forEach(notification -> sseEmitterUtil.sendEventWithSseEmitter(
-                    emitter, notification.getId().toString(), notification.getMessage())
-            );
+        notificationRepository.deleteById(notificationId);
+    }
+
+    @Transactional
+    public void removeOldNotification() {
+        LocalDateTime limitDateTime = LocalDateTime.now().minusWeeks(2);
+        notificationRepository.deleteAllByCreateDateBefore(limitDateTime);
+    }
+
+
+    @Transactional(readOnly = true)
+    public Notification getNotification(Long notificationId) {
+       return notificationRepository.findById(notificationId)
+                .orElseThrow(NotificationNotFoundException::new);
+    }
+
+    public void checkNotificationReceiver(Long receiverId, Long memberId) {
+        if (!receiverId.equals(memberId)) {
+            throw new NotAuthorizedException();
         }
-
-        return emitter;
     }
 
 }
