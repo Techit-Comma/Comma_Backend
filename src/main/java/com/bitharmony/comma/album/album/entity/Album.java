@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,11 +30,11 @@ import lombok.NoArgsConstructor;
 public class Album {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "album_id")
+	@Column
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id")
+	@JoinColumn
 	@NotNull
 	private Member member;
 

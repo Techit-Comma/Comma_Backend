@@ -1,8 +1,7 @@
 package com.bitharmony.comma.global.security;
 
-import com.bitharmony.comma.global.exception.ExpiredAccessTokenException;
+import com.bitharmony.comma.global.exception.member.ExpiredAccessTokenException;
 import com.bitharmony.comma.global.util.JwtUtil;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

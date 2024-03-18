@@ -2,7 +2,7 @@ package com.bitharmony.comma.album.album.entity;
 
 import static lombok.AccessLevel.*;
 
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;

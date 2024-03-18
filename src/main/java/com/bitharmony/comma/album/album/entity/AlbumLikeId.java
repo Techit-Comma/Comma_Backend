@@ -5,7 +5,7 @@ import static lombok.AccessLevel.*;
 
 import java.io.Serializable;
 
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.ManyToOne;

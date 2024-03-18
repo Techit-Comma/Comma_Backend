@@ -30,16 +30,12 @@ public class AlbumServiceRegular {
 	}
 
 	public void resetStreamingCountsRegularly() {
-		JobKey jobKey = makeJobKey("ResetStreamingCounts");
+		JobKey jobKey = jobKey("ResetStreamingCounts", "AlbumService");
 
 		JobDetail jobDetail = makeJobDetail(jobKey);
 		Trigger trigger = makeTrigger(jobKey);
 
 		makeSchedule(jobDetail, trigger);
-	}
-
-	private JobKey makeJobKey(String jobName) {
-		return jobKey(jobName, "AlbumService");
 	}
 
 	private JobDetail makeJobDetail(JobKey jobKey){

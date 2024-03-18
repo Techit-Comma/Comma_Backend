@@ -1,6 +1,6 @@
 package com.bitharmony.comma.global.util;
 
-import com.bitharmony.comma.global.exception.ExpiredAccessTokenException;
+import com.bitharmony.comma.global.exception.member.ExpiredAccessTokenException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,16 +12,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.bitharmony.comma.member.dto.JwtCreateRequest;
+import com.bitharmony.comma.member.auth.dto.JwtCreateRequest;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -103,10 +101,6 @@ public class JwtUtil {
         try {
             getClaim(token);
             return true;
-        } catch (SignatureException e) {
-            return false;
-        } catch (MalformedJwtException e) {
-            return false;
         } catch (ExpiredJwtException e) {
             throw new ExpiredAccessTokenException();
         } catch (JwtException e) {

@@ -2,11 +2,11 @@ package com.bitharmony.comma.community.artitcle.service;
 
 import com.bitharmony.comma.community.artitcle.dto.ArticleModifyRequest;
 import com.bitharmony.comma.community.artitcle.entity.Article;
-import com.bitharmony.comma.community.artitcle.entity.ArticleImage;
 import com.bitharmony.comma.community.artitcle.repository.ArticleRepository;
-import com.bitharmony.comma.community.artitcle.util.NcpArticleImageUtil;
 import com.bitharmony.comma.global.exception.community.ArticleNotFoundException;
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.member.notification.service.NotificationService;
+import com.bitharmony.comma.member.notification.util.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +22,7 @@ import java.util.Optional;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final NotificationService notificationService;
 
     public Article getArticleById(long id) {
         Optional<Article> article = articleRepository.findById(id);
@@ -43,6 +44,7 @@ public class ArticleService {
                 .build();
 
         articleRepository.save(article);
+        notificationService.sendArtistNotification(writer, NotificationType.NEW_ARTICLE, article.getId());
 
         return article;
     }

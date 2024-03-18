@@ -1,6 +1,6 @@
 package com.bitharmony.comma.member.follow.dto;
 
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 import lombok.Builder;
 
 @Builder

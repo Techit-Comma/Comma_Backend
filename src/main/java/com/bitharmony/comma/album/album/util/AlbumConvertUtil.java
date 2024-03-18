@@ -3,7 +3,6 @@ package com.bitharmony.comma.album.album.util;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
-import com.bitharmony.comma.album.file.util.NcpImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

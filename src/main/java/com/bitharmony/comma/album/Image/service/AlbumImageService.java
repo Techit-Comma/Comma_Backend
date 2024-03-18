@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.bitharmony.comma.album.file.dto.FileResponse;
-import com.bitharmony.comma.album.file.service.FileService;
-import com.bitharmony.comma.album.file.util.FileType;
-import com.bitharmony.comma.album.file.util.NcpImageUtil;
+import com.bitharmony.comma.file.dto.FileResponse;
+import com.bitharmony.comma.file.service.FileService;
+import com.bitharmony.comma.file.util.FileType;
+import com.bitharmony.comma.album.album.util.NcpImageUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,13 +21,17 @@ public class AlbumImageService {
 
 	@Transactional
 	public FileResponse uploadAlbumImage(MultipartFile musicImageFile) {
-		return fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName());
+		FileResponse fileResponse = fileService.getFileResponse(musicImageFile,
+				ncpImageUtil.getBucketName(),
+				ncpImageUtil.getImageCdn(),
+				ncpImageUtil.getImageCdnQueryString()
+		);
+		fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName(), fileResponse.uploadFileName());
+		return fileResponse;
 	}
 
 	public boolean checkImageFile(MultipartFile musicImageFile) {
 		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
-		if (imgFile.isEmpty() || musicImageFile == null) return false;
-
-		return true;
-	}
+        return imgFile.isPresent() && musicImageFile != null;
+    }
 }
