@@ -53,7 +53,7 @@ public class WithdrawController {
 
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("id"));
-        Pageable pageable = PageRequest.of(page-1, 5, Sort.by(sorts));
+        Pageable pageable = PageRequest.of(page-1, 10, Sort.by(sorts));
 
         Member member = memberService.getMemberByUsername(principal.getName());
         Page<Withdraw> withdraws = withdrawService.getMyWithdrawList(member.getId(), pageable);
