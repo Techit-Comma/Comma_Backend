@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record MemberReturnResponse(
+        Long memberId,
         String username,
         String Email,
         String nickname,

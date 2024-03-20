@@ -2,7 +2,6 @@ package com.bitharmony.comma.member.notification.util;
 
 import com.bitharmony.comma.member.notification.repository.DeferredResultRepository;
 import com.bitharmony.comma.member.notification.repository.NotificationRepository;
-import com.bitharmony.comma.member.notification.service.NotificationService;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.Message;
@@ -35,7 +34,7 @@ public class ArtistNotificationListener implements MessageListener {
     public void completeDeferredResult(String key) {
         deferredResultRepository.findByKey(key).ifPresent(deferredResult -> {
             deferredResult.setResult(
-                    notificationRepository.findAllBySubscriberIdOrderByCreateDateAsc(Long.parseLong(key)).stream()
+                    notificationRepository.findAllBySubscriberIdOrderByCreateDateDesc(Long.parseLong(key)).stream()
                             .map(notificationConvertUtil::convertToNotificationResponse)
                             .toList()
             );

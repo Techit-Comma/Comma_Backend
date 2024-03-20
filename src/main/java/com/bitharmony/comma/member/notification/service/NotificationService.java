@@ -67,7 +67,7 @@ public class NotificationService {
     }
 
     public List<NotificationResponse> getNotifications(String subscriberId) {
-        return notificationRepository.findAllBySubscriberIdOrderByCreateDateAsc(Long.parseLong(subscriberId)).stream()
+        return notificationRepository.findAllBySubscriberIdOrderByCreateDateDesc(Long.parseLong(subscriberId)).stream()
                 .map(notificationConvertUtil::convertToNotificationResponse)
                 .toList();
     }
