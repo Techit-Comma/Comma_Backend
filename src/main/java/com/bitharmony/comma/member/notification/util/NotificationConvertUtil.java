@@ -9,10 +9,11 @@ public class NotificationConvertUtil {
 
     public NotificationResponse convertToNotificationResponse(Notification notification) {
         return NotificationResponse.builder()
-                .id(notification.getId())
+                .notificationId(notification.getId())
                 .message(notification.getMessage())
                 .redirectUrl(notification.getRedirectUrl())
                 .publisherName(notification.getPublisher().getNickname())
+                .publisherProfileImageUrl(notification.getPublisher().getImageUrl())
                 .isRead(notification.getIsRead())
                 .createDate(notification.getCreateDate())
                 .build();

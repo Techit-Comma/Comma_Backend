@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -55,17 +56,17 @@ public class NotificationController {
     // 알림 읽음 처리
     @PreAuthorize("isAuthenticated()")
     @PostMapping
-    public void readNotification(NotificationRequest notificationRequest, Principal principal) {
+    public void readNotification(@RequestBody NotificationRequest notificationRequest, Principal principal) {
         Member member = memberService.getMemberByUsername(principal.getName());
-        notificationService.readNotification(notificationRequest.id(), member);
+        notificationService.readNotification(notificationRequest.notificationId(), member);
     }
 
     // 알림 삭제
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping
-    public void removeNotification(NotificationRequest notificationRequest, Principal principal) {
+    public void removeNotification(@RequestBody NotificationRequest notificationRequest, Principal principal) {
         Member member = memberService.getMemberByUsername(principal.getName());
-        notificationService.removeNotification(notificationRequest.id(), member);
+        notificationService.removeNotification(notificationRequest.notificationId(), member);
     }
 
     // 오래된 알림 삭제는 스케쥴러로 매 달마다 이루어지도록 설정
