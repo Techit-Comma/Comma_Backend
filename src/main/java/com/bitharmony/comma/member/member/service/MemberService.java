@@ -100,6 +100,7 @@ public class MemberService {
         Member findMember = getMemberByUsername(loginedMember.getUsername());
 
         return MemberReturnResponse.builder()
+                .memberId(findMember.getId())
                 .username(findMember.getUsername())
                 .Email(findMember.getEmail())
                 .nickname(findMember.getNickname())

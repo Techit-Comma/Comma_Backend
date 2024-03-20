@@ -5,10 +5,11 @@ import lombok.Builder;
 
 @Builder
 public record NotificationResponse (
-        Long id,
+        Long notificationId,
         String message,
         String redirectUrl,
         String publisherName,
+        String publisherProfileImageUrl,
         Boolean isRead,
         LocalDateTime createDate
 ){

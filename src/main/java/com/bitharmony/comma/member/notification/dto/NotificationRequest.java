@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record NotificationRequest(
-        Long id
+        Long notificationId
 ){
 
 }
