@@ -1,5 +1,6 @@
 package com.bitharmony.comma.member.member.controller;
 
+import com.bitharmony.comma.global.exception.member.NotAuthorizedException;
 import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.member.dto.MemberImageResponse;
 import com.bitharmony.comma.member.member.dto.MemberJoinRequest;
@@ -52,6 +53,14 @@ public class MemberController {
     public GlobalResponse mypage() {
         MemberReturnResponse response = memberService.getProfile();
         return GlobalResponse.of("200", response);
+    }
+
+    @GetMapping("/check")
+    public GlobalResponse check() {
+        if (!memberService.getUser().isCredentialsNonExpired()) {
+            throw new NotAuthorizedException();
+        }
+        return GlobalResponse.of("200");
     }
 
     @GetMapping("/{username}")
