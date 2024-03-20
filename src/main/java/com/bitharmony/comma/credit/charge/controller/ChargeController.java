@@ -83,6 +83,8 @@ public class ChargeController {
         return new ResponseEntity<>(
                 ChargeCreateResponse.builder()
                         .chargeId(charge.getId())
+                        .chargeCode(charge.getCode())
+                        .username(charge.getCharger().getUsername())
                         .build(),
                 HttpStatus.CREATED
         );
