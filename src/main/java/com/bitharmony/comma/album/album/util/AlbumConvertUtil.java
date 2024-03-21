@@ -1,10 +1,12 @@
 package com.bitharmony.comma.album.album.util;
 
+import org.springframework.stereotype.Component;
+
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class AlbumConvertUtil {
                 .genre(album.getGenre())
                 .license(album.isLicense())
                 .licenseDescription(album.getLicenseDescription())
-                .imgUrl(convertAlbumImageUrl(album.getImagePath()))
+                .imgUrl(album.getImagePath())
                 .fileUrl(album.getFilePath())
                 .permit(album.isPermit())
                 .price(album.getPrice())
