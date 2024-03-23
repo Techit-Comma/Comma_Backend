@@ -102,7 +102,7 @@ public class MemberService {
         return MemberReturnResponse.builder()
                 .memberId(findMember.getId())
                 .username(findMember.getUsername())
-                .Email(findMember.getEmail())
+                .email(findMember.getEmail())
                 .nickname(findMember.getNickname())
                 .profileImageUrl(findMember.getImageUrl())
                 .build();
@@ -114,7 +114,7 @@ public class MemberService {
 
         return MemberReturnResponse.builder()
                 .username(findMember.getUsername())
-                .Email(findMember.getEmail())
+                .email(findMember.getEmail())
                 .nickname(findMember.getNickname())
                 .profileImageUrl(findMember.getImageUrl())
                 .build();
@@ -141,16 +141,20 @@ public class MemberService {
     }
 
     @Transactional
-    public void passwordModify(String password, String passwordCheck) {
-        if (!password.equals(passwordCheck)) {
+    public void passwordModify(String password, String newPassword, String newPasswordCheck) {
+        if (!newPassword.equals(newPasswordCheck)) {
             throw new InvalidPasswordException();
         }
 
         SecurityUser user = getUser();
         Member member = getMemberByUsername(user.getUsername());
 
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new IncorrectPasswordException();
+        }
+
         member = member.toBuilder()
-                .password(passwordEncoder.encode(password))
+                .password(passwordEncoder.encode(newPassword))
                 .build();
 
         memberRepository.save(member);

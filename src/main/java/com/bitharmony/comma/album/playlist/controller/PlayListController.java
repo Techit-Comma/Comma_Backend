@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,9 +34,9 @@ public class PlayListController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping
-    public void createPlaylist(PlaylistRequest playlistRequest, Principal principal) {
+    public void createPlaylist(@RequestBody PlaylistRequest playlistRequest, Principal principal) {
         Member member = memberService.getMemberByUsername(principal.getName());
-        playlistService.createPlaylist(playlistRequest.title(), member);
+        playlistService.createPlaylist(playlistRequest.title(), playlistRequest.description(), member);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -52,10 +53,10 @@ public class PlayListController {
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{playlistId}")
-    public void modifyPlaylistInfo(@PathVariable Long playlistId, PlaylistRequest playlistRequest,
+    public void modifyPlaylistInfo(@PathVariable Long playlistId, @RequestBody PlaylistRequest playlistRequest,
             Principal principal) {
         Member member = memberService.getMemberByUsername(principal.getName());
-        playlistService.modifyPlaylist(playlistId, playlistRequest.title(), member);
+        playlistService.modifyPlaylist(playlistId, playlistRequest.title(), playlistRequest.description(), member);
     }
 
     @PreAuthorize("isAuthenticated()")

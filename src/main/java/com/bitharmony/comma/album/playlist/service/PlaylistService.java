@@ -28,9 +28,10 @@ public class PlaylistService {
     private final AlbumConvertUtil albumConvertUtil;
 
     @Transactional
-    public void createPlaylist(String title, Member member) {
+    public void createPlaylist(String title, String description, Member member) {
         Playlist playlist = Playlist.builder()
                 .title(title)
+                .description(description)
                 .producer(member)
                 .build();
 
@@ -69,12 +70,13 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void modifyPlaylist(Long playlistId, String title, Member member) {
+    public void modifyPlaylist(Long playlistId, String title, String description, Member member) {
         Playlist playlist = getPlaylistById(playlistId);
         checkPlaylistProducer(playlist.getProducer().getId(), member.getId());
 
         Playlist _playlist = playlist.toBuilder()
                 .title(title)
+                .description(description)
                 .build();
 
         playlistRepository.save(_playlist);

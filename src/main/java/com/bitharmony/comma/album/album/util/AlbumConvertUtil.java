@@ -20,7 +20,7 @@ public class AlbumConvertUtil {
                 .albumname(album.getAlbumname())
                 .genre(album.getGenre())
                 .fileUrl(album.getFilePath()) // TODO: file URL로 변경하기 + NCP MusicUtil과 설정 통합
-                .imgUrl(convertAlbumImageUrl(album.getImagePath()))
+                .imgUrl(album.getImagePath())
                 .artistUsername(album.getMember().getUsername())
                 .artistNickname(album.getMember().getNickname())
                 .build();

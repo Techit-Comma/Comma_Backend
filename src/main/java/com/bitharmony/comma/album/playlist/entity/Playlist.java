@@ -28,6 +28,9 @@ public class Playlist {
     @Column(nullable = false)
     private String title;
 
+    @Column
+    private String description;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Member producer;
