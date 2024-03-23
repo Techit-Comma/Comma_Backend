@@ -1,5 +1,6 @@
 package com.bitharmony.comma.album.album.repository;
 
+import com.bitharmony.comma.member.member.entity.Member;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,7 +109,7 @@ public class AlbumRepositoryImpl implements AlbumRepositoryCustom{
 	}
 
 	@Override
-	public Page<Album> musicRecommendation10Albums(Principal principal, Pageable pageable) {
+	public Page<Album> musicRecommendation10Albums(Principal principal, Member loginedMember, Pageable pageable) {
 		//비회원도 추천을 해야 하는가? -> 어짜피 로그인 해야 들을 수 있을꺼면..
 		//테스트 필요.. 지금은 앨범 10개가 안되어서.. 랜덤으로 나오긴 함
 
@@ -123,7 +124,7 @@ public class AlbumRepositoryImpl implements AlbumRepositoryCustom{
 			List<String> likedGenres = jpaQueryFactory
 				.select(album.genre)
 				.from(album)
-				.where(album.albumLikes.contains(member))
+				.where(album.albumLikes.contains(loginedMember))
 				.fetch();
 
 			JPAQuery<Album> query = jpaQueryFactory

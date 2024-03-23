@@ -126,8 +126,8 @@ public class AlbumService {
 		});
 	}
 
-	public Page<Album> musicRecommendation10Albums(Principal principal, Pageable pageable) {
-		return albumRepository.musicRecommendation10Albums(principal, pageable);
+	public Page<Album> musicRecommendation10Albums(Principal principal, Member member, Pageable pageable) {
+		return albumRepository.musicRecommendation10Albums(principal, member, pageable);
 	}
 
 	public Page<Album> streamingTop10Albums(Pageable pageable) {

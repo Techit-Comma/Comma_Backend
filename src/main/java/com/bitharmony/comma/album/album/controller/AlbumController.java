@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -192,13 +193,19 @@ public class AlbumController {
 
 	@GetMapping("/recommendAlbum")
 	public GlobalResponse getRecommendAlbum(Principal principal) {
-		List<Sort.Order> sorts = new ArrayList<>();
-		sorts.add(Sort.Order.desc("id"));
-		Pageable pageable = PageRequest.of(0, 10, Sort.by(sorts));
+		Optional<Member> memberOpt = Optional.empty();
 
-		Page<Album> itemsPage = albumService.musicRecommendation10Albums(principal, pageable);
+		if (principal != null) {
+			memberOpt = Optional.ofNullable(memberService.getMemberByUsername(principal.getName()));
+		}
+
+		Sort sort = Sort.by(Sort.Direction.DESC, "id");
+		Pageable pageable = PageRequest.of(0, 10, sort);
+
+		Page<Album> itemsPage = albumService.musicRecommendation10Albums(principal, memberOpt.orElse(null), pageable);
 		return GlobalResponse.of("200", itemsPage.map(albumConvertUtil::albumToResponseDto).toList());
 	}
+
 
 	@GetMapping("/searchAlbum")
 	public GlobalResponse searchAlbum(@Valid AlbumFindRequest request) {
