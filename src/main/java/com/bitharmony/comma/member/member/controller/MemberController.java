@@ -78,8 +78,11 @@ public class MemberController {
 
     @PutMapping("/passwordModify")
     public GlobalResponse passwordModify(@RequestBody @Valid MemberPwModifyRequest memberPwModifyRequest) {
-        memberService.passwordModify(memberPwModifyRequest.passwordModify(),
-                memberPwModifyRequest.passwordModifyCheck());
+        memberService.passwordModify(
+                memberPwModifyRequest.password(),
+                memberPwModifyRequest.newPassword(),
+                memberPwModifyRequest.newPasswordCheck()
+        );
 
         return GlobalResponse.of("200");
     }
