@@ -63,6 +63,7 @@ public class PlaylistService {
 
         return PlaylistDetailResponse.builder()
                 .title(playlist.getTitle())
+                .description(playlist.getDescription())
                 .producerUsername(playlist.getProducer().getUsername())
                 .producerNickname(playlist.getProducer().getNickname()) // TODO: Album 정보 넘길 시에도 같은 형식으로 넘기기에 리팩토링 필요
                 .albumList(albums.stream().map(albumConvertUtil::convertToDto).toList())
