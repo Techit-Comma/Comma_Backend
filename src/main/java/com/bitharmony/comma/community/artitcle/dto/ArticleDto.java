@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 public record ArticleDto(
         long id,
         String username,
+        String userProfile,
         Article.Category category,
-        String title,
         String content,
         LocalDateTime createDate,
         LocalDateTime modifyDate
@@ -19,8 +19,8 @@ public record ArticleDto(
         this(
                 article.getId(),
                 article.getWriter().getUsername(),
+                article.getWriter().getImageUrl(),
                 article.getCategory(),
-                article.getTitle(),
                 article.getContent(),
                 article.getCreateDate(),
                 article.getModifyDate()
