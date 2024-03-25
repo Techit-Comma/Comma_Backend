@@ -43,15 +43,17 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public GlobalResponse logout() {
-        memberService.logout();
+    public GlobalResponse logout(Principal principal) {
+        Member member = memberService.getMemberByUsername(principal.getName());
+        memberService.logout(member);
         return GlobalResponse.of("200");
     }
 
 
     @GetMapping("/mypage")
-    public GlobalResponse mypage() {
-        MemberReturnResponse response = memberService.getProfile();
+    public GlobalResponse mypage(Principal principal) {
+        Member member = memberService.getMemberByUsername(principal.getName());
+        MemberReturnResponse response = memberService.getProfile(member);
         return GlobalResponse.of("200", response);
     }
 
@@ -71,17 +73,20 @@ public class MemberController {
     }
 
     @PutMapping("/modify")
-    public GlobalResponse modify(@RequestBody @Valid MemberModifyRequest memberModifyRequest) {
-        memberService.modify(memberModifyRequest.nickname(), memberModifyRequest.email());
+    public GlobalResponse modify(@RequestBody @Valid MemberModifyRequest memberModifyRequest, Principal principal) {
+        Member member = memberService.getMemberByUsername(principal.getName());
+        memberService.modify(memberModifyRequest.nickname(), memberModifyRequest.email(), member);
         return GlobalResponse.of("200");
     }
 
     @PutMapping("/passwordModify")
-    public GlobalResponse passwordModify(@RequestBody @Valid MemberPwModifyRequest memberPwModifyRequest) {
+    public GlobalResponse passwordModify(@RequestBody @Valid MemberPwModifyRequest memberPwModifyRequest, Principal principal) {
+        Member member = memberService.getMemberByUsername(principal.getName());
         memberService.passwordModify(
                 memberPwModifyRequest.password(),
                 memberPwModifyRequest.newPassword(),
-                memberPwModifyRequest.newPasswordCheck()
+                memberPwModifyRequest.newPasswordCheck(),
+                member
         );
 
         return GlobalResponse.of("200");
