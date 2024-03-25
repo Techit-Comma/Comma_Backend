@@ -3,6 +3,7 @@ package com.bitharmony.comma.member.member.service;
 import com.bitharmony.comma.global.exception.member.DuplicateNicknameException;
 import com.bitharmony.comma.global.exception.member.IncorrectPasswordException;
 import com.bitharmony.comma.global.exception.member.InvalidPasswordException;
+import com.bitharmony.comma.global.exception.member.NotAuthorizedException;
 import com.bitharmony.comma.member.member.repository.MemberRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -58,10 +59,9 @@ public class MemberService {
     }
 
     @Transactional
-    public void logout() {
-        SecurityUser loginedMember = getUser();
-        if (redisTemplate.opsForValue().get(loginedMember.getUsername()) != null) {
-            redisTemplate.delete(loginedMember.getUsername());
+    public void logout(Member member) {
+        if (redisTemplate.opsForValue().get(member.getUsername()) != null) {
+            redisTemplate.delete(member.getUsername());
         }
     }
 
@@ -95,16 +95,13 @@ public class MemberService {
                 .orElseThrow(MemberNotFoundException::new);
     }
 
-    public MemberReturnResponse getProfile() {
-        SecurityUser loginedMember = getUser();
-        Member findMember = getMemberByUsername(loginedMember.getUsername());
-
+    public MemberReturnResponse getProfile(Member member) {
         return MemberReturnResponse.builder()
-                .memberId(findMember.getId())
-                .username(findMember.getUsername())
-                .email(findMember.getEmail())
-                .nickname(findMember.getNickname())
-                .profileImageUrl(findMember.getImageUrl())
+                .memberId(member.getId())
+                .username(member.getUsername())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .profileImageUrl(member.getImageUrl())
                 .build();
     }
 
@@ -121,18 +118,12 @@ public class MemberService {
     }
 
     @Transactional
-    public void modify(String nickname, String email) {
-
-        SecurityUser user = getUser();
-        long id = user.getId();
-        Member findMember = memberRepository.findById(id)
-                .orElseThrow(MemberNotFoundException::new);
-
+    public void modify(String nickname, String email, Member member) {
         if (memberRepository.findByNickname(nickname).isPresent()) {
             throw new DuplicateNicknameException();
         }
 
-        Member modifyMember = findMember.toBuilder()
+        Member modifyMember = member.toBuilder()
                 .nickname(nickname)
                 .email(email)
                 .build();
@@ -141,13 +132,10 @@ public class MemberService {
     }
 
     @Transactional
-    public void passwordModify(String password, String newPassword, String newPasswordCheck) {
+    public void passwordModify(String password, String newPassword, String newPasswordCheck, Member member) {
         if (!newPassword.equals(newPasswordCheck)) {
             throw new InvalidPasswordException();
         }
-
-        SecurityUser user = getUser();
-        Member member = getMemberByUsername(user.getUsername());
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new IncorrectPasswordException();
@@ -161,8 +149,15 @@ public class MemberService {
     }
 
     public SecurityUser getUser() {
-        return (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof SecurityUser) {
+            return (SecurityUser) principal;
+        } else {
+            throw new NotAuthorizedException();
+        }
     }
+
 
     @Transactional
     public void updateCredit(String username, Long updatedCredit) {

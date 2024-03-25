@@ -7,6 +7,7 @@ import lombok.Builder;
 @Builder
 public record PlaylistDetailResponse(
         String title,
+        String description,
         String producerUsername,
         String producerNickname,
         List<AlbumListResponse> albumList

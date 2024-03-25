@@ -69,7 +69,7 @@ public class PlayListController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{playlistId}/album")
     public void addAlbumToPlaylist(@PathVariable Long playlistId,
-            PlaylistAlbumRequest playlistAlbumRequest) {
+            @RequestBody PlaylistAlbumRequest playlistAlbumRequest) {
         Album album = albumService.getAlbumById(playlistAlbumRequest.albumId());
         playlistService.addPlaylistAlbum(playlistId, album);
     }
@@ -77,7 +77,7 @@ public class PlayListController {
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{playlistId}/album")
     public void deleteAlbumToPlaylist(@PathVariable Long playlistId,
-            PlaylistAlbumRequest playlistAlbumRequest, Principal principal) {
+            @RequestBody PlaylistAlbumRequest playlistAlbumRequest, Principal principal) {
         Member member = memberService.getMemberByUsername(principal.getName());
         playlistService.deletePlaylistAlbum(playlistId, playlistAlbumRequest.albumId(), member);
     }
