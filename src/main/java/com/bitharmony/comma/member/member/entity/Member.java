@@ -62,7 +62,7 @@ public class Member {
     @OneToMany(mappedBy = "producer")
     private List<Playlist> playlists = new ArrayList<>();
 
-    @OneToMany
+    @OneToMany(mappedBy = "member")
     private List<Album> albumList = new ArrayList<>();
 
     @Builder.Default
