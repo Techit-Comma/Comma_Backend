@@ -34,12 +34,11 @@ public class ArticleService {
         return article.get();
     }
 
-    public Article write(Member writer, Article.Category category, String title, String content, Member artist) {
+    public Article write(Member writer, Article.Category category, String content, Member artist) {
         Article article = Article.builder()
                 .writer(writer)
                 .artist(artist)
                 .category(category)
-                .title(title)
                 .content(content)
                 .build();
 
@@ -56,7 +55,6 @@ public class ArticleService {
     public void modifyArticle(Article article, ArticleModifyRequest request) {
         Article _article = article.toBuilder()
                 .category(request.category())
-                .title(request.title())
                 .content(request.content())
                 .modifyDate(LocalDateTime.now())
                 .build();
