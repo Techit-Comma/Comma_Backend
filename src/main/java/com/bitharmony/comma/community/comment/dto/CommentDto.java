@@ -10,6 +10,7 @@ public record CommentDto(
         long commentId,
         long articleId,
         String username,
+        String profileUrl,
         String content,
         LocalDateTime createDate,
         LocalDateTime modifyDate
@@ -19,6 +20,7 @@ public record CommentDto(
                 comment.getId(),
                 comment.getArticle().getId(),
                 comment.getCommenter().getUsername(),
+                comment.getCommenter().getImageUrl(),
                 comment.getContent(),
                 comment.getCreateDate(),
                 comment.getModifyDate()

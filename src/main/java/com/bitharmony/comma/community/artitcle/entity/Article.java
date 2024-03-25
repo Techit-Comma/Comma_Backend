@@ -37,9 +37,6 @@ public class Article {
     private Category category;
 
     @NotNull
-    private String title;
-
-    @NotNull
     private String content;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -54,7 +51,6 @@ public class Article {
         공지사항,
         홍보,
         소통
-
     }
 
 }

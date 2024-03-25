@@ -63,11 +63,11 @@ public class ArticleImageService {
         articleImageRepository.delete(articleImage);
     }
 
-    public Map<Long, String> getArticleImageByArticleId(long articleId) {
+    public List<String> getArticleImageByArticleId(long articleId) {
         List<ArticleImage> articleImages = articleImageRepository.findByArticleId(articleId);
-        Map<Long, String> imageUrls = new HashMap<>();
+        List<String> imageUrls = new ArrayList<>();
         for(ArticleImage image : articleImages){
-            imageUrls.put(image.getId(), image.getImageUrl());
+            imageUrls.add(image.getImageUrl());
         }
 
         return imageUrls;
@@ -76,5 +76,13 @@ public class ArticleImageService {
     public ArticleImage getArticleImageById(long imageId) {
         return articleImageRepository.findById(imageId)
                 .orElseThrow(ImageNotFoundException::new);
+    }
+
+    public ArticleImage getArticleImageByImageUrl(String imageUrl){
+        return articleImageRepository.findByImageUrl(imageUrl).orElseThrow(ImageNotFoundException::new);
+    }
+
+    public String getImageUrl(String fileName){
+        return ncpArticleImageUtil.getArticleCdn() + "/" + fileName + ncpArticleImageUtil.getImageCdnQueryString();
     }
 }

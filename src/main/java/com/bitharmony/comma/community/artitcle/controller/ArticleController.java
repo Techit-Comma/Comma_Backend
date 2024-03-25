@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class ArticleController {
     public GlobalResponse<ArticleGetResponse> getArticle(@PathVariable long id) {
 
         Article article = articleService.getArticleById(id);
-        Map<Long, String> imageUrls = articleImageService.getArticleImageByArticleId(id);
+        List<String> imageUrls = articleImageService.getArticleImageByArticleId(id);
 
         return GlobalResponse.of(
                 "200",
@@ -48,7 +49,6 @@ public class ArticleController {
                         .id(article.getId())
                         .username(article.getWriter().getUsername())
                         .category(article.getCategory())
-                        .title(article.getTitle())
                         .content(article.getContent())
                         .imageUrls(imageUrls)
                         .createDate(article.getCreateDate())
@@ -86,13 +86,20 @@ public class ArticleController {
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sorts));
 
         Member member = memberService.getMemberByUsername(artistUsername);
-
         Page<Article> articles = articleService.getArticleListByArtistIdAndCategory(member.getId(), category, pageable);
+
+        Map<Long, List<String>> articleImages = new HashMap<>();
+
+        for(Article article : articles){
+          List<String> articleImage = articleImageService.getArticleImageByArticleId(article.getId());
+          articleImages.put(article.getId(), articleImage);
+        }
 
         return GlobalResponse.of(
                 "200",
                 ArticleGetListResponse.builder()
                         .articleList(articles.map(ArticleDto::new))
+                        .articleImages(articleImages)
                         .build()
         );
     }
@@ -124,7 +131,7 @@ public class ArticleController {
             throw new NotAuthorizedException();
         }
 
-        Article article = articleService.write(member, request.category(), request.title(), request.content(), artist);
+        Article article = articleService.write(member, request.category(), request.content(), artist);
 
         return GlobalResponse.of(
                 "200",
@@ -147,6 +154,7 @@ public class ArticleController {
             articleImageService.saveImageUrl(article, imageUrl);
             imageUrls.add(imageUrl);
         }
+
 
         return GlobalResponse.of(
                 "200",
@@ -201,14 +209,15 @@ public class ArticleController {
         );
     }
 
-    @DeleteMapping("/images/{imageId}")
+    @DeleteMapping("/images/{fileName}")
     @PreAuthorize("isAuthenticated()")
     public GlobalResponse<Void> deleteArticleImage(
-            @PathVariable long imageId, Principal principal
+            @PathVariable String fileName, Principal principal
     ) {
-        ArticleImage articleImage = articleImageService.getArticleImageById(imageId);
+        String imageUrl = articleImageService.getImageUrl(fileName);
+        ArticleImage articleImage = articleImageService.getArticleImageByImageUrl(imageUrl);
             articleImageService.deleteFile(articleImage.getImageUrl());
-            articleImageService.deleteArticleImage(imageId);
+            articleImageService.deleteArticleImage(articleImage.getId());
 
             return GlobalResponse.of("204");
     }
