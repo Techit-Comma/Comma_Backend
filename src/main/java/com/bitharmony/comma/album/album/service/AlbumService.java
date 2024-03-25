@@ -1,7 +1,5 @@
 package com.bitharmony.comma.album.album.service;
 
-import com.bitharmony.comma.member.notification.service.NotificationService;
-import com.bitharmony.comma.member.notification.util.NotificationType;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -17,13 +15,15 @@ import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.album.album.dto.AlbumFindRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
-import com.bitharmony.comma.global.exception.album.AlbumNotFoundException;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
-import com.bitharmony.comma.file.service.FileService;
 import com.bitharmony.comma.album.album.util.NcpImageUtil;
-import com.bitharmony.comma.member.member.entity.Member;
 import com.bitharmony.comma.album.streaming.util.NcpMusicUtil;
+import com.bitharmony.comma.file.service.FileService;
+import com.bitharmony.comma.global.exception.album.AlbumNotFoundException;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.member.notification.service.NotificationService;
+import com.bitharmony.comma.member.notification.util.NotificationType;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -63,8 +63,8 @@ public class AlbumService {
 
 	@Transactional
 	public void delete(Album album) {
-		ncpMusicUtil.deleteFile(album.getFilePath());
-		fileService.deleteFile(album.getImagePath(), fileService.getFileName(album.getImagePath(), ncpImageUtil.getBucketName()));
+		// ncpMusicUtil.deleteFile(album.getFilePath());
+		// fileService.deleteFile(album.getImagePath(), fileService.getFileName(album.getImagePath(), ncpImageUtil.getBucketName()));
 		albumRepository.delete(album);
 	}
 
