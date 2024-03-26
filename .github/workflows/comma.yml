@@ -1,4 +1,4 @@
-name: work-1
+name: comma
 on:
   push:
     paths:
@@ -49,14 +49,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
-
-      - name: Setup MySQL
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql root password: ${{ secrets.MYSQL_PASSWORD }} # Required if "mysql user" is empty, default is empty. The root superuser password
-
       - name: 레지스트리 로그인
         uses: docker/login-action@v2
         with:
@@ -83,8 +75,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ env.OWNER_LC }}/bitharmony-comma:${{ needs.makeTagAndRelease.outputs.tag_name }},
-            ghcr.io/${{ env.OWNER_LC }}/bitharmony-comma:latest
+            ghcr.io/${{ env.OWNER_LC }}/compose-market:${{ needs.makeTagAndRelease.outputs.tag_name }},
+            ghcr.io/${{ env.OWNER_LC }}/compose-market:latest
 
   autoDeployUsingSSH:
     needs: buildImageAndPush
@@ -102,7 +94,7 @@ jobs:
           debug: true
           script:
             whoami;
-            docker rm -f deploy_1;
-            docker rmi ghcr.io/techit-bitharmony/bitharmony-comma:latest;
-            docker pull ghcr.io/techit-bitharmony/bitharmony-comma:latest;
-            docker run --name deploy_1  -d -p 8080:8090 -e TZ=Asia/Seoul ghcr.io/techit-bitharmony/bitharmony-comma:latest;
+            docker rm -f comma_deploy;
+            docker rmi ghcr.io/techit-comma/compose-market:latest;
+            docker pull ghcr.io/techit-comma/compose-market:latest;
+            docker run --name comma_deploy -d -p 8080:8090 -e TZ=Asia/Seoul ghcr.io/techit-comma/compose-market:latest;
