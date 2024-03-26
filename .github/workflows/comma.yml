@@ -94,5 +94,8 @@ jobs:
           debug: true
           script:
             whoami;
+            echo $TOKEN | docker login ghcr.io -u $USERNAME --password-stdin
+            docker rm -f comma_deploy;
+            docker rmi ghcr.io/techit-comma/compose-market:latest;
             docker pull ghcr.io/techit-comma/compose-market:latest;
             docker run --name comma_deploy -d -p 8080:8090 -e TZ=Asia/Seoul ghcr.io/techit-comma/compose-market:latest;
