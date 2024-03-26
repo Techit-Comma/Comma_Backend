@@ -18,7 +18,7 @@ public class OauthController {
 
     private final OAuthService oAuthService;
     private final CookieProvider cookieProvider;
-    private final static String REDIRECT_URL = "http://localhost:3000?oauth=true";
+    private final static String REDIRECT_URL = "https://www.com-ma.shop?oauth=true";
 
     @GetMapping("/google")
     public String getGoogleLoginUrl() {
