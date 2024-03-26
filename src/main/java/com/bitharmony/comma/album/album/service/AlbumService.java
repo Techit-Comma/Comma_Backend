@@ -9,62 +9,66 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
+import com.bitharmony.comma.album.album.dto.AlbumFindRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
-import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
-import com.bitharmony.comma.album.file.service.FileService;
-import com.bitharmony.comma.album.file.util.FileType;
-import com.bitharmony.comma.album.file.util.NcpImageUtil;
-import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.streaming.util.NcpMusicUtil;
+import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
+import com.bitharmony.comma.album.album.util.NcpImageUtil;
+import com.bitharmony.comma.album.streaming.util.NcpMusicUtil;
+import com.bitharmony.comma.file.service.FileService;
+import com.bitharmony.comma.global.exception.album.AlbumNotFoundException;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.member.notification.service.NotificationService;
+import com.bitharmony.comma.member.notification.util.NotificationType;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AlbumService {
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
+	private final NotificationService notificationService;
 	private final NcpImageUtil ncpImageUtil;
 	private final NcpMusicUtil ncpMusicUtil;
+	private final AlbumConvertUtil albumConvertUtil;
 
 	@Transactional
-	public Album release(AlbumCreateRequest request, Member member, MultipartFile musicImageFile) {
+	public Album release(AlbumCreateRequest request, Member member) {
 		Album album = request.toEntity();
 		album.updateReleaseMember(member);
-		return saveAlbum(album, musicImageFile);
+		saveAlbum(album);
+
+		notificationService.sendArtistNotification(member, NotificationType.NEW_ALBUM, album.getId()); // 알림 발송
+		return album;
 	}
 
 	@Transactional
-	public Album edit(AlbumEditRequest request, Album album, MultipartFile musicImageFile) {
+	public Album edit(AlbumEditRequest request, Album album) {
 		album.update(request);
 
-		if (musicImageFile != null && album.getFilePath() != null)
-			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()), ncpImageUtil.getBucketName());
+		if (album.getFilePath() != null)
+			fileService.deleteFile(album.getImagePath(), fileService.getFileName(album.getImagePath(), ncpImageUtil.getBucketName()));
 
-		saveAlbum(album, musicImageFile);
+		saveAlbum(album);
 		return album;
 	}
 
 	@Transactional
 	public void delete(Album album) {
-		ncpMusicUtil.deleteFile(album.getFilePath());
-		fileService.deleteFile(album.getImagePath(), ncpImageUtil.getBucketName());
+		// ncpMusicUtil.deleteFile(album.getFilePath());
+		// fileService.deleteFile(album.getImagePath(), fileService.getFileName(album.getImagePath(), ncpImageUtil.getBucketName()));
 		albumRepository.delete(album);
 	}
 
-	public Album saveAlbum(Album album, MultipartFile musicImageFile) {
-		if (musicImageFile != null) {
-			String imageUrl = fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName()).uploadFileUrl();
-			album = album.toBuilder().imagePath(imageUrl).build();
-		}
-
+	public Album saveAlbum(Album album) {
 		albumRepository.save(album);
 		return album;
 	}
@@ -79,75 +83,61 @@ public class AlbumService {
 			.map(u -> albumRepository.findFirst20ByMemberUsernameOrderByIdDesc(u, topTwenty))
 			.orElse(albumRepository.findFirst20ByOrderByIdDesc(topTwenty));
 
-		return albums.map(this::convertToDto);
+		return albums.map(albumConvertUtil::convertToDto);
 	}
 
-	public AlbumListResponse convertToDto(Album album) {
-		return AlbumListResponse.builder()
-			.id(album.getId())
-			.albumname(album.getAlbumname())
-			.genre(album.getGenre())
-			.imgPath(getAlbumImageUrl(album.getImagePath()))
-			.permit(album.isPermit())
-			.price(album.getPrice())
-			.artistUsername(album.getMember().getUsername())
-			.artistNickname(album.getMember().getNickname())
-			.build();
+	public Page<Album> search(AlbumFindRequest request, Pageable pageable) {
+		return albumRepository.search(request.kwTypes(), request.kw(), pageable);
 	}
 
-	private String replaceBucketName(String filepath, String bucketName, String replacement) {
-		return filepath.replace(bucketName, replacement);
-	}
-
-	public String getAlbumImageUrl(String filepath) {
-		if (filepath == null) {
-			return null;
-		}
-
-		return ncpImageUtil.getImageCdn() + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "")
-			+ ncpImageUtil.getImageCdnQueryString();
-	}
-
-	public String getAlbumFileUrl(String filepath) {
-		return ncpImageUtil.getEndPoint() + "/" + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "");
-	}
-
-	public boolean canRelease(String name, MultipartFile musicImageFile, Member member) {
+	public boolean canRelease(String name, Member member) {
 		if (member == null)
 			return false;
-		if (albumRepository.findByAlbumname(name).isPresent())
-			return false;
+        return albumRepository.findByAlbumname(name).isEmpty();
+    }
 
-		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
-		if (imgFile.isEmpty() && musicImageFile != null)
-			return false;
-
-		return true;
-	}
-
-	public boolean canEdit(Album album, Principal principal, MultipartFile musicImageFile,
-		@Valid AlbumEditRequest request, Member member) {
+	public boolean canEdit(Album album, Principal principal, @Valid AlbumEditRequest request, Member member) {
 		if (member == null)
 			return false;
 		if (!album.getMember().getUsername().equals(principal.getName()))
 			return false;
-		if (albumRepository.findByAlbumname(request.albumname()).isPresent() && !album.getAlbumname().equals(request.albumname()))
-			return false;
-
-		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
-		if (imgFile.isEmpty() && musicImageFile != null)
-			return false;
-
-		return true;
-	}
+        return albumRepository.findByAlbumname(request.albumname()).isEmpty()
+                || album.getAlbumname().equals(request.albumname());
+    }
 
 	public boolean canDelete(Album album, Principal principal) {
-		if (!album.getMember().getUsername().equals(principal.getName()))
+        return album.getMember().getUsername().equals(principal.getName());
+    }
+
+	public boolean canBuy(Member member, Album album) {
+		if (member.getCredit() < album.getPrice())
 			return false;
-		return true;
+		if (album.getMember().getUsername().equals(member.getUsername()))
+			return false;
+        return album.isPermit();
+    }
+
+	@Transactional
+	public void resetStreamingCounts() {
+		log.info("Resetting streaming counts");
+		albumRepository.findAll().forEach(album -> {
+			album.getStreamingCounts().clear();
+			albumRepository.save(album);
+		});
 	}
 
-	public Album getAlbumByFilePath(String filePath) {
-		return albumRepository.findByFilePath(filePath).orElseThrow(AlbumNotFoundException::new);
+	public Page<Album> musicRecommendation10Albums(Principal principal, Member member, Pageable pageable) {
+		return albumRepository.musicRecommendation10Albums(principal, member, pageable);
+	}
+
+	public Page<Album> streamingTop10Albums(Pageable pageable) {
+		return albumRepository.streamingTop10Albums(pageable);
+	}
+
+	public void streamingMember(Member member, Album album) {
+		if(!album.getStreamingCounts().contains(member)) {
+			album.getStreamingCounts().add(member);
+			albumRepository.save(album);
+		}
 	}
 }

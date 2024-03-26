@@ -7,9 +7,9 @@ import com.bitharmony.comma.credit.withdraw.repository.WithdrawRepository;
 import com.bitharmony.comma.global.exception.credit.HandledWithdrawException;
 import com.bitharmony.comma.global.exception.credit.NotEnoughCreditException;
 import com.bitharmony.comma.global.exception.credit.WithdrawNotFoundException;
-import com.bitharmony.comma.global.exception.NotAuthorizedException;
-import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.member.repository.MemberRepository;
+import com.bitharmony.comma.global.exception.member.NotAuthorizedException;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.member.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service

@@ -1,6 +1,6 @@
 package com.bitharmony.comma.credit.withdraw.entity;
 
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -43,11 +43,6 @@ public class Withdraw {
 
 
     public boolean isHandled() {
-
-        if (withdrawCancelDate != null || withdrawDoneDate != null) {
-            return true;
-        }
-
-        return false;
+        return withdrawCancelDate != null || withdrawDoneDate != null;
     }
 }

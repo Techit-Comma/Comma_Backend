@@ -1,8 +1,14 @@
 package com.bitharmony.comma.album.album.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
+import java.util.Optional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,23 +16,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
+import com.bitharmony.comma.album.album.dto.AlbumFindRequest;
 import com.bitharmony.comma.album.album.dto.AlbumListResponse;
-import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
-import com.bitharmony.comma.album.album.exception.AlbumFieldException;
-import com.bitharmony.comma.album.album.exception.AlbumPermissionException;
+import com.bitharmony.comma.global.exception.album.AlbumBuyException;
+import com.bitharmony.comma.global.exception.album.AlbumFieldException;
+import com.bitharmony.comma.global.exception.album.AlbumPermissionException;
 import com.bitharmony.comma.album.album.service.AlbumLikeService;
 import com.bitharmony.comma.album.album.service.AlbumService;
-import com.bitharmony.comma.global.exception.MemberNotFoundException;
+import com.bitharmony.comma.album.album.util.AlbumConvertUtil;
+import com.bitharmony.comma.global.exception.member.MemberNotFoundException;
 import com.bitharmony.comma.global.response.GlobalResponse;
-import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.member.service.MemberService;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.member.member.service.MemberService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,28 +44,28 @@ public class AlbumController {
 
 	private final AlbumService albumService;
 	private final AlbumLikeService albumLikeService;
+	private final AlbumConvertUtil albumConvertUtil;
 	private final MemberService memberService;
 
 	@PostMapping("/release")
 	@PreAuthorize("isAuthenticated()")
-	public GlobalResponse releaseAlbum(@Valid AlbumCreateRequest request,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile, Principal principal) {
+	public GlobalResponse releaseAlbum(@Valid AlbumCreateRequest request, Principal principal) {
 
 		Member member = memberService.getMemberByUsername(principal.getName());
 
-		if (!albumService.canRelease(request.albumname(), musicImageFile, member)) {
+		if (!albumService.canRelease(request.albumname(), member)) {
 			throw new AlbumFieldException();
 		}
 
-		Album album = albumService.release(request, member, musicImageFile);
-		return GlobalResponse.of("200", albumToResponseDto(album));
+		Album album = albumService.release(request, member);
+		return GlobalResponse.of("200", albumConvertUtil.albumToResponseDto(album));
 	}
 
 	@GetMapping("/detail/{id}")
 	public GlobalResponse getAlbum(@PathVariable long id) {
 		Album album = albumService.getAlbumById(id);
 
-		return GlobalResponse.of("200", albumToResponseDto(album));
+		return GlobalResponse.of("200", albumConvertUtil.albumToResponseDto(album));
 	}
 
 	@GetMapping("/{username}")
@@ -67,7 +73,7 @@ public class AlbumController {
 		Member member = memberService.getMemberByUsername(username);
 
 		if (member == null) {
-			throw new MemberNotFoundException("존재하지 않는 회원입니다.");
+			throw new MemberNotFoundException();
 		}
 
 		 Page<AlbumListResponse> albumPage = albumService.getLatest20Albums(username);
@@ -82,17 +88,16 @@ public class AlbumController {
 
 	@PutMapping("/{id}")
 	@PreAuthorize("isAuthenticated()")
-	public GlobalResponse editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile, Principal principal) {
+	public GlobalResponse editAlbum(@PathVariable long id, @Valid AlbumEditRequest request, Principal principal) {
 		Album album = albumService.getAlbumById(id);
 		Member member = memberService.getMemberByUsername(principal.getName());
 
-		if (!albumService.canEdit(album, principal, musicImageFile, request, member)) {
+		if (!albumService.canEdit(album, principal, request, member)) {
 			throw new AlbumFieldException();
 		}
 
-		Album editedAlbum = albumService.edit(request, album, musicImageFile);
-		return GlobalResponse.of("200", albumToResponseDto(editedAlbum));
+		Album editedAlbum = albumService.edit(request, album);
+		return GlobalResponse.of("200", albumConvertUtil.albumToResponseDto(editedAlbum));
 	}
 
 	@DeleteMapping("/{id}")
@@ -117,7 +122,7 @@ public class AlbumController {
 		return GlobalResponse.of("200", albumLikeService.canLike(member, album));
 	}
 
-	@PostMapping(value = "/{albumId}/like")
+	@PostMapping("/{albumId}/like")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalResponse like(@PathVariable long albumId, Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
@@ -131,7 +136,7 @@ public class AlbumController {
 		return GlobalResponse.of("200");
 	}
 
-	@PostMapping(value = "/{albumId}/cancelLike")
+	@PostMapping("/{albumId}/cancelLike")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalResponse cancelLike(@PathVariable long albumId, Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
@@ -145,24 +150,70 @@ public class AlbumController {
 		return GlobalResponse.of("200");
 	}
 
-	private AlbumResponse albumToResponseDto(Album album) {
-		album = album.toBuilder()
-			//.filePath(albumService.getAlbumFileUrl(album.getFilePath()))
-			.imagePath(albumService.getAlbumImageUrl(album.getImagePath()))
-			.build();
+	@PostMapping("/{albumId}/buy")
+	@PreAuthorize("isAuthenticated()")
+	public GlobalResponse buyAlbum(@PathVariable long albumId, Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		Album album = albumService.getAlbumById(albumId);
 
-		return AlbumResponse.builder()
-			.id(album.getId())
-			.albumname(album.getAlbumname())
-			.genre(album.getGenre())
-			.license(album.isLicense())
-			.licenseDescription(album.getLicenseDescription())
-			.imgPath(album.getImagePath())
-			.filePath(album.getFilePath())
-			.permit(album.isPermit())
-			.price(album.getPrice())
-			.artistNickname(album.getMember().getNickname())
-			.artistUsername(album.getMember().getUsername())
-			.build();
+		if (!albumService.canBuy(member, album)) {
+			throw new AlbumBuyException();
+		}
+
+		memberService.updateUserAlbum(member, album);
+		return GlobalResponse.of("200");
+	}
+
+	@GetMapping("/myAlbum")
+	@PreAuthorize("isAuthenticated()")
+		public GlobalResponse getMyAlbum(Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		return GlobalResponse.of("200", member.getAlbumList().stream().map(albumConvertUtil::albumToResponseDto).toList());
+	}
+
+	@PostMapping("/{albumId}/streaming")
+	@PreAuthorize("isAuthenticated()")
+	public GlobalResponse streaming(@PathVariable long albumId, Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		Album album = albumService.getAlbumById(albumId);
+
+		albumService.streamingMember(member, album);
+		return GlobalResponse.of("200");
+	}
+
+	@GetMapping("/streamingTop10Albums")
+	public GlobalResponse getTop10Albums() {
+		List<Sort.Order> sorts = new ArrayList<>();
+		sorts.add(Sort.Order.desc("id"));
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(sorts));
+
+		Page<Album> itemsPage = albumService.streamingTop10Albums(pageable);
+		return GlobalResponse.of("200", itemsPage.map(albumConvertUtil::albumToResponseDto).toList());
+	}
+
+	@GetMapping("/recommendAlbum")
+	public GlobalResponse getRecommendAlbum(Principal principal) {
+		Optional<Member> memberOpt = Optional.empty();
+
+		if (principal != null) {
+			memberOpt = Optional.ofNullable(memberService.getMemberByUsername(principal.getName()));
+		}
+
+		Sort sort = Sort.by(Sort.Direction.DESC, "id");
+		Pageable pageable = PageRequest.of(0, 10, sort);
+
+		Page<Album> itemsPage = albumService.musicRecommendation10Albums(principal, memberOpt.orElse(null), pageable);
+		return GlobalResponse.of("200", itemsPage.map(albumConvertUtil::albumToResponseDto).toList());
+	}
+
+
+	@GetMapping("/searchAlbum")
+	public GlobalResponse searchAlbum(@Valid AlbumFindRequest request) {
+		List<Sort.Order> sorts = new ArrayList<>();
+		sorts.add(Sort.Order.desc("id"));
+		Pageable pageable = PageRequest.of(request.page() - 1, 10, Sort.by(sorts));
+
+		Page<Album> itemsPage = albumService.search(request, pageable);
+		return GlobalResponse.of("200", itemsPage.map(albumConvertUtil::albumToResponseDto).toList());
 	}
 }

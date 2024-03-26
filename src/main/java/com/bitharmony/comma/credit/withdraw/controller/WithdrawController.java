@@ -3,10 +3,9 @@ package com.bitharmony.comma.credit.withdraw.controller;
 import com.bitharmony.comma.credit.withdraw.dto.*;
 import com.bitharmony.comma.credit.withdraw.service.WithdrawService;
 import com.bitharmony.comma.credit.withdraw.entity.Withdraw;
-import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.member.service.MemberService;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.member.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +52,7 @@ public class WithdrawController {
 
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("id"));
-        Pageable pageable = PageRequest.of(page-1, 5, Sort.by(sorts));
+        Pageable pageable = PageRequest.of(page-1, 10, Sort.by(sorts));
 
         Member member = memberService.getMemberByUsername(principal.getName());
         Page<Withdraw> withdraws = withdrawService.getMyWithdrawList(member.getId(), pageable);

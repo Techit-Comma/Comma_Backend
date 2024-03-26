@@ -39,3 +39,4 @@ out/
 ### resources ###
 /src/main/resources/application-custom.yml
 /src/main/resources/application-secret.yml
+/src/main/java/com/bitharmony/comma/global/init/InitData.java

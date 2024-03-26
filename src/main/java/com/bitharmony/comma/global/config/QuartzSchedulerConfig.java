@@ -2,7 +2,6 @@ package com.bitharmony.comma.global.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +38,7 @@ public class QuartzSchedulerConfig {
     private Properties quartzProperties() {
         PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
         propertiesFactoryBean.setLocation(new ClassPathResource("application.yml"));
-        Properties properties = null;
+        Properties properties;
         try {
             propertiesFactoryBean.afterPropertiesSet();
             properties = propertiesFactoryBean.getObject();

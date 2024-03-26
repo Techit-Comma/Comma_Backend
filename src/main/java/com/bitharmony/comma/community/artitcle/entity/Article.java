@@ -1,7 +1,7 @@
 package com.bitharmony.comma.community.artitcle.entity;
 
 import com.bitharmony.comma.community.comment.entity.Comment;
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -30,17 +30,17 @@ public class Article {
     @NotNull
     private Member artist;
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments;
 
     @Enumerated(EnumType.STRING)
     private Category category;
 
     @NotNull
-    private String title;
-
-    @NotNull
     private String content;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ArticleImage> imageUrl;
 
     @Builder.Default
     private LocalDateTime createDate = LocalDateTime.now();
@@ -51,7 +51,6 @@ public class Article {
         공지사항,
         홍보,
         소통
-
     }
 
 }

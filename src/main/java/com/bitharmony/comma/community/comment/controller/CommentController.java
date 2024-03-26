@@ -3,10 +3,10 @@ package com.bitharmony.comma.community.comment.controller;
 import com.bitharmony.comma.community.comment.dto.*;
 import com.bitharmony.comma.community.comment.entity.Comment;
 import com.bitharmony.comma.community.comment.service.CommentService;
-import com.bitharmony.comma.global.exception.NotAuthorizedException;
+import com.bitharmony.comma.global.exception.member.NotAuthorizedException;
 import com.bitharmony.comma.global.response.GlobalResponse;
-import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.member.service.MemberService;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.member.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -73,7 +73,7 @@ public class CommentController {
         Member member = memberService.getMemberByUsername(principal.getName());
         Comment comment = commentService.getCommentById(commentId);
 
-        if(!commentService.canDeleteOrModify(member, comment)) {
+        if(commentService.canNotDeleteOrModify(member, comment)) {
             throw new NotAuthorizedException();
         }
 
@@ -94,7 +94,7 @@ public class CommentController {
         Member member = memberService.getMemberByUsername(principal.getName());
         Comment comment = commentService.getCommentById(commentId);
 
-        if(!commentService.canDeleteOrModify(member, comment)) {
+        if(commentService.canNotDeleteOrModify(member, comment)) {
             throw new NotAuthorizedException();
         }
 

@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,16 +29,12 @@ public class AlbumLikeService {
 	public Boolean canLike(Member member, Album album) {
 		if (member == null) return false;
 		if (album == null) return false;
-		if (album.getAlbumLikes().contains(member)) return false;
-
-		return true;
-	}
+        return !album.getAlbumLikes().contains(member);
+    }
 
 	public Boolean canCancelLike(Member member, Album album) {
 		if (member == null) return false;
 		if (album == null) return false;
-		if (!album.getAlbumLikes().contains(member)) return false;
-
-		return true;
-	}
+        return album.getAlbumLikes().contains(member);
+    }
 }

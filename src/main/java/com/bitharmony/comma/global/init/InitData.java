@@ -5,9 +5,9 @@ import com.bitharmony.comma.credit.charge.service.ChargeService;
 import com.bitharmony.comma.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.credit.creditLog.service.CreditLogService;
 import com.bitharmony.comma.credit.withdraw.service.WithdrawService;
-import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.member.repository.MemberRepository;
-import com.bitharmony.comma.member.service.MemberService;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.member.member.repository.MemberRepository;
+import com.bitharmony.comma.member.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.boot.ApplicationRunner;
@@ -38,7 +38,6 @@ public class InitData {
             @Transactional
             @SneakyThrows
             public void run(ApplicationArguments args) {
-
             }
         };
     }

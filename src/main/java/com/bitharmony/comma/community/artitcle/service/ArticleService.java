@@ -4,7 +4,9 @@ import com.bitharmony.comma.community.artitcle.dto.ArticleModifyRequest;
 import com.bitharmony.comma.community.artitcle.entity.Article;
 import com.bitharmony.comma.community.artitcle.repository.ArticleRepository;
 import com.bitharmony.comma.global.exception.community.ArticleNotFoundException;
-import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.member.entity.Member;
+import com.bitharmony.comma.member.notification.service.NotificationService;
+import com.bitharmony.comma.member.notification.util.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final NotificationService notificationService;
 
     public Article getArticleById(long id) {
         Optional<Article> article = articleRepository.findById(id);
@@ -31,16 +34,16 @@ public class ArticleService {
         return article.get();
     }
 
-    public Article write(Member writer, Article.Category category, String title, String content, Member artist) {
+    public Article write(Member writer, Article.Category category, String content, Member artist) {
         Article article = Article.builder()
                 .writer(writer)
                 .artist(artist)
                 .category(category)
-                .title(title)
                 .content(content)
                 .build();
 
         articleRepository.save(article);
+        notificationService.sendArtistNotification(writer, NotificationType.NEW_ARTICLE, article.getId());
 
         return article;
     }
@@ -52,7 +55,6 @@ public class ArticleService {
     public void modifyArticle(Article article, ArticleModifyRequest request) {
         Article _article = article.toBuilder()
                 .category(request.category())
-                .title(request.title())
                 .content(request.content())
                 .modifyDate(LocalDateTime.now())
                 .build();
@@ -76,4 +78,5 @@ public class ArticleService {
             return articleRepository.findByArtistIdAndCategory(id, category, pageable);
         }
     }
+
 }

@@ -10,7 +10,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://compose-market.vercel.app")
+                .allowedOrigins("http://localhost:3000")
+                .allowedOrigins("https://www.com-ma.shop")
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .allowCredentials(true);
