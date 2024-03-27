@@ -9,20 +9,20 @@ public class CookieProvider {
 
     public ResponseCookie createAccessTokenCookie(String accessToken) {
         return ResponseCookie.from("accessToken", accessToken)
-                .domain("www.com-ma.shop")
+                .domain("com-ma.shop")
                 .path("/")
                 .httpOnly(false)
-                .secure(false)
+                .secure(true)
                 .maxAge(Duration.ofHours(1))
                 .build();
     }
 
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("refreshToken", refreshToken)
-                .domain("www.com-ma.shop")
+                .domain("com-ma.shop")
                 .path("/")
                 .httpOnly(false)
-                .secure(false)
+                .secure(true)
                 .maxAge(Duration.ofDays(7))
                 .build();
     }
