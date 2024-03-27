@@ -9,7 +9,7 @@ public class CookieProvider {
 
     public ResponseCookie createAccessTokenCookie(String accessToken) {
         return ResponseCookie.from("accessToken", accessToken)
-                .domain("localhost")
+                .domain("com-ma.shop")
                 .path("/")
                 .httpOnly(false)
                 .secure(false)
@@ -19,7 +19,7 @@ public class CookieProvider {
 
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("refreshToken", refreshToken)
-                .domain("localhost")
+                .domain("com-ma.shop")
                 .path("/")
                 .httpOnly(false)
                 .secure(false)
