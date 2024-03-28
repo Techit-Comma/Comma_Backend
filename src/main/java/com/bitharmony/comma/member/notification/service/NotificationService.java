@@ -40,10 +40,15 @@ public class NotificationService {
         List<Member> followers = followService.getAllFollowerList(artist);
 
         for (Member follower : followers) {
+            String redirectUrl = notificationType.getRedirectUrl() + contentId;
+            if (notificationType.equals(NotificationType.NEW_ARTICLE)) {
+                redirectUrl = "/" + artist.getUsername() + notificationType.getRedirectUrl();
+            }
+
             // 팔로워 별로 알림 생성
             Notification notification = notificationRepository.save(Notification.builder()
                     .message(message)
-                    .redirectUrl(notificationType.getRedirectUrl() + contentId)
+                    .redirectUrl(redirectUrl)
                     .publisher(artist)
                     .subscriber(follower)
                     .build()
