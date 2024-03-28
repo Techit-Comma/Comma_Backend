@@ -6,11 +6,11 @@
 
 <table>
   <tr>
-    <th><h3><a href="https://compose-market.vercel.app/">👉🏻 COM,MA 이용해보기!</a></h3></th>
-    <th><h3><a href="https://compose-market.vercel.app/">📝 Bit-Harmony 팀 노션!</a></h3></th>
+    <th><h3><a href="https://www.com-ma.shop/">👉🏻 COM,MA 이용해보기!</a></h3></th>
+    <th><h3><a href="https://www.notion.so/native/6-e7ff60a1b88041379f19ce1d75d1997f?pvs=40">📝 팀 노션!</a></h3></th>
   </tr>
   <tr>
-    <td><img src="https://github.com/Techit-BitHarmony/Comma_Frontend/assets/51808344/0b9d3a70-15cc-452c-810b-bb11aad7b4ff"/></td>
+    <td><img src="https://github.com/Techit-Comma/Comma_Backend/assets/51808344/4735cca7-4887-48d5-8d9d-28060caa13b8"/></td>
     <td><img src="https://github.com/Techit-BitHarmony/Comma_Frontend/assets/84844598/9f469180-b465-49b1-bca2-69efa11ba5c8"/></td>
   </tr>
 </table>
@@ -18,31 +18,42 @@
 <br>
 
 ## 📆 프로젝트 기간
-**2024.01.15 ~ 2024.02.16**
+### 1차
+#### 2024.01.15 ~ 2024.02.16  /  [1차 시연영상](https://www.youtube.com/watch?v=A3au1HW8CmE)
 
+### 2차
+#### 2024.02.26 ~ 2024.03.29  /  [2차 시연영상](https://www.youtube.com/watch?v=kxlKRjdShrQ)
 <br>
 
 ## 📒 기술스택
-#### FRONT-END
+### FRONT-END
+#### 1차
 <img src="https://img.shields.io/badge/HTML-E34F26?style=for-the-badge&logo=HTML5&logoColor=white"/> <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=black"/> <img src="https://img.shields.io/badge/vercel-000000?style=for-the-badge&logo=vercel&logoColor=white"/> <br> 
 <img src="https://img.shields.io/badge/svelte-FF3E00?style=for-the-badge&logo=svelte&logoColor=white"/> <img src="https://img.shields.io/badge/tailwindcss-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"/> <img src="https://img.shields.io/badge/daisyui-5A0EF8?style=for-the-badge&logo=daisyui&logoColor=white"/> <br>
+#### 2차
+<img src="https://img.shields.io/badge/HTML-E34F26?style=for-the-badge&logo=HTML5&logoColor=white"/> <img src="https://img.shields.io/badge/Typescript-3178C6?style=for-the-badge&logo=JavaScript&logoColor=white"/> <img src="https://img.shields.io/badge/vercel-000000?style=for-the-badge&logo=vercel&logoColor=white"/> <br> 
+<img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=Next.js&logoColor=white"/> <img src="https://img.shields.io/badge/react-333333?style=for-the-badge&logo=react&logoColor=sky"/> <img src="https://img.shields.io/badge/tailwindcss-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"/> <img src="https://img.shields.io/badge/mui-007FFF?style=for-the-badge&logo=mui&logoColor=white"/> <br>
 
-#### BACK-END
-<img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=Spring Security&logoColor=white"/> 
-<img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"/> <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"/> <br>
-<img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/> <img src="https://img.shields.io/badge/GitHub Actions-2088FF?style=for-the-badge&logo=GitHub Actions&logoColor=white"/> <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/> <img src="https://img.shields.io/badge/jwt-333333?style=for-the-badge&logo=jwt&logoColor=white"/> <img src="https://img.shields.io/badge/quartz-333333?style=for-the-badge&logo=quartz&logoColor=white"/> <br>
+### BACK-END
+#### Project
+<img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=Spring Security&logoColor=white"/> <br>
+<img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"/> <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"/> 
+<img src="https://img.shields.io/badge/jwt-333333?style=for-the-badge&logo=jwt&logoColor=white"/> <img src="https://img.shields.io/badge/quartz-333333?style=for-the-badge&logo=quartz&logoColor=white"/> <br>
+#### CI/CD
+<img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/> <img src="https://img.shields.io/badge/GitHub Actions-2088FF?style=for-the-badge&logo=GitHub Actions&logoColor=white"/> <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/>
+#### SaaS
 <img src="https://img.shields.io/badge/NCP_Object Storage-03C75A?style=for-the-badge&logo=naver&logoColor=white"/> <img src="https://img.shields.io/badge/NCP_Image Optimizer-03C75A?style=for-the-badge&logo=naver&logoColor=white"/> <br> 
 <img src="https://img.shields.io/badge/NCP_Cloud Functions-03C75A?style=for-the-badge&logo=naver&logoColor=white"/> <img src="https://img.shields.io/badge/NCP_VOD Station-03C75A?style=for-the-badge&logo=naver&logoColor=white"/> <img src="https://img.shields.io/badge/NCP_Global Edge-03C75A?style=for-the-badge&logo=naver&logoColor=white"/>
 
 <br>
 
 ## ⛓ Architecture
-![Comma_TechStack](https://github.com/Techit-BitHarmony/Comma_Frontend/assets/84844598/d15e27a6-d3d2-47bd-93e5-b935086490eb)      
+![Comma_TechStack](https://github.com/Techit-Comma/Comma_Backend/assets/51808344/bab82596-0f0a-4df0-9e86-07cd761b06c5)
 
 <br>
 
 ## 🧱 ERD
-![Comma ERD](https://github.com/Techit-BitHarmony/Comma_Frontend/assets/84844598/d5a04df4-5d03-4443-bae1-c363b7273685)  
+![Comma_ERD](https://github.com/Techit-Comma/Comma_Backend/assets/51808344/7d5056fc-e7fe-4322-baff-ae79e512df69)
 
 <br>
 
@@ -71,8 +82,12 @@
       <td><img src="https://github.com/Techit-BitHarmony/Comma/assets/51808344/b2d44a42-33d8-4e91-9054-b27b2b2b52aa"/></th>
     </tr>
     <tr>
-      <th>토큰 저장 및 조회</th>
-      <td><img src="https://github.com/Techit-BitHarmony/Comma/assets/51808344/2ed704ac-ad02-42d9-bc68-bd9d08fe0874"/></th>
+      <th>Long polling & Redis Pub/Sub</th>
+      <td><img src="https://github.com/Techit-Comma/Comma_Backend/assets/51808344/939e602b-f9c8-4ff7-9d4e-0ed6a59bbf9a"/></th>
+    </tr>
+    <tr>
+      <th></th>
+      <td></td>
     </tr>
   </table>
 </details>
@@ -99,10 +114,22 @@
       <th>게시글 삭제 시 순환참조 이슈</th>
       <td><img src="https://github.com/Techit-BitHarmony/Comma/assets/51808344/c12f001c-bc69-4113-8fe5-f3679e7ea84e"/></th>
     </tr>
+    <tr>
+      <th>Long Polling 시 Security Context 전파 이슈</th>
+      <td><img src="https://github.com/Techit-Comma/Comma_Backend/assets/51808344/3d242159-f8f1-41de-9e63-387d232b6768"/></th>
+    </tr>
+    <tr>
+      <th>토스 결제창이 클릭되지 않는 이슈</th>
+      <td><img src="https://github.com/Techit-Comma/Comma_Backend/assets/51808344/a1ad2442-9d4d-4e2c-8549-74ca1009965c"/></th>
+    </tr>
+    <tr>
+      <th>파일 업로드 취소 시 발생하는 이슈</th>
+      <td><img src="https://github.com/Techit-Comma/Comma_Backend/assets/51808344/54692398-892b-4ff8-9fae-1b9e648d85e9"/></th>
+    </tr>
   </table>
 </details>
 
 <br>
 
 ## 🎶 BitHarmony - 프로젝트 팀원
-[조유민](https://github.com/YuminJo) / [박상혁](https://github.com/DropTheGit) / [조동국](https://github.com/ppusda) /
+[조유민](https://github.com/YuminJo) / [박상혁](https://github.com/DropTheGit) / [조동국](https://github.com/ppusda)
